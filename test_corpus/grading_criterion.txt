@@ -1,0 +1,44 @@
+Grading Rubric (Criterion):
+
+These are essays written by begining level adult ESL students. 
+The topic of the essay was:
+
+"Tell us about yourself and your family"
+
+They were expected to write atleast 6 sentences. The essays are
+graded according to the following measures/criterion:
+
+(If not enough sentences to measure any of the categories below, give a score of 3)
+
+1. Syntax/Grammar
+
+a) Word order - Is the word order correct?
+
+b) Subject-Verb agreement - agreement with respect to person and number (singular/plural)
+
+c) Verb tense + missing verb or extra verb - is verb tense used correctly? Is a verb missing? (e.g. auxilliary?)
+
+d) Sentence formation - are the sentences formed properly? (i.e. begining and ending properly, 
+   are the constituents formed properly? missing words (prepositions, subject, object etc.)?)
+
+2. Discourse/Semantics
+
+a) Is the essay coherent? Does it make sense?
+
+b) Does the essay address the topic?
+
+3. Length of the essay: 
+
+a) Is the length appropriate (atleast 6 sentences required)?
+   This is not a strict measure of clearly marked sentences. Instead check the number of clauses formed (attempted).
+
+Essays were graded based on each of the categories. A score of (1-5) was given to each category, with
+5 being the highest. The following formula was used to compute the final grade out of 10:
+
+Final Score = (1a + 1b + 1c + 2*1d + 2a + 3*2b + 3a)/10
+
+More weight is given to 2b since it is necessary that they inderstand the question.
+
+Fractions are rounded off to the mid points. For example 3.14 = 3.0, 3.56 = 3.5 and 3.71 = 4.0.
+
+The grades for each of the essays are in grades.txt

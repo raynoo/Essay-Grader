@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nlp.grader.objects.Rule;
+import nlp.grader.objects.Tags;
+
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.trees.GrammaticalStructure;
 import edu.stanford.nlp.trees.GrammaticalStructureFactory;
@@ -17,8 +20,11 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Criteria {
 	
-	public static List<TypedDependency> isVerbAgreeing(Tree tree) {
+	private static List<Rule> verbNounRules = null;
+	
+	public static boolean isVerbAgreeing(Tree tree) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
+		boolean agreement = true;
 		
 		//get the dependency tree
 		TreebankLanguagePack tlp = new PennTreebankLanguagePack();
@@ -31,7 +37,7 @@ public class Criteria {
 		TypedDependency[] list = td.toArray(new TypedDependency[0]);
 		
 		for(TypedDependency dep : list) {
-			if (dep.reln().getShortName().equals("nsubj")) {
+			if(dep.reln().getShortName().equals("nsubj")) {
 				nsubjs.add(dep);
 			}
 		}
@@ -45,45 +51,57 @@ public class Criteria {
 			String rhs = taggedWords.get(dep.dep().index()-1).tag();
 			
 			System.out.println("");
-			System.out.println(dep.gov().index() + ", " + dep.gov().value() + ", " + dep.dep().index() + ", " + dep.dep().value());
+			System.out.println(dep.gov().index() + ", " + dep.gov().value() + ", " + 
+					dep.dep().index() + ", " + dep.dep().value());
 			System.out.println(lhs + ", " + rhs);
 			
-//			isVerbAgreeing(lhs, rhs);
+			if(!isVerbAgreeing(lhs, rhs)) {
+				agreement = false;
+				break;
+			}
 		}
-		
-		return nsubjs;
+		System.out.println("\nVerb-Noun agreement: " + agreement);
+		return agreement;
 	}
 	
 	private static boolean isVerbAgreeing(String verbTag, String nounTag) {
-		List<Rule> verbNounRules = loadVerbNounRules();
+		List<Rule> verbNounRules = getVerbNounRules();
 		
-		for(Rule r : verbNounRules) {
-			if(r.lhs().equals(verbTag) && r.rhs().equals(nounTag))
-				return true;
+		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
+		if(isVerbTag(verbTag)) {
+			for(Rule r : verbNounRules) {
+				if(r.lhs().equals(verbTag) && r.rhs().equals(nounTag))
+					return true;
+			}
 		}
-		
 		return false;
 	}
 	
-	public static List<Rule> loadVerbNounRules() {
-		BufferedReader br = null;
-		String line;
-		List<Rule> rules = new ArrayList<Rule>();
-		
-		try {
-			br = new BufferedReader(new FileReader("rules/verb_noun_agreement_rules.txt"));
-
-			while ((line = br.readLine()) != null) {
-				System.out.println(line.split("\\s"));
-				String[] rule = line.split("\\s");
-				rules.add(new Rule(rule[0], rule[1]));
-			}
-
-			br.close();
+	private static boolean isVerbTag(String tag) {
+		return Tags.getVerbTags().contains(tag);
+	}
+	
+	private static List<Rule> getVerbNounRules() {
+		if(verbNounRules == null) {
+			verbNounRules = new ArrayList<Rule>();
 			
-		} catch(IOException ioe) {
-			ioe.printStackTrace();
+			BufferedReader br = null;
+			String line;
+			
+			try {
+				br = new BufferedReader(new FileReader("rules/verb_noun_agreement_rules.txt"));
+				
+				while ((line = br.readLine()) != null) {
+					String[] rule = line.split("\\s");
+					verbNounRules.add(new Rule(rule[0], rule[1]));
+				}
+				
+				br.close();
+				
+			} catch(IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
-		return rules;
+		return verbNounRules;
 	}
 }

@@ -17,12 +17,6 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Main {
 
-	HashMap<String, String> tagMap = new HashMap<String, String>();
-	
-	/**
-	 * Demo of generating parse tree using PCFG.
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		
 		Main main = new Main();
@@ -31,10 +25,7 @@ public class Main {
 				"closed airports and forced thousands of people to sleep in their offices or walk " +
 				"home during the night, officials said today.";
 
-		List<TaggedWord> twords = main.getWordTags(input);
-		
-		for(TaggedWord s : twords)
-			System.out.println("Word: " + s.value() + " Tag: " + s.tag());
+//		List<TaggedWord> twords = main.getWordTags(input);
 		
 		Tree tree = main.getParseTree(input);
 		Criteria.isVerbAgreeing(tree);
@@ -53,8 +44,12 @@ public class Main {
 		}
 		
 		List<List<HasWord>> tokenList = MaxentTagger.tokenizeText(new StringReader(sentence));
+		List<TaggedWord> twords = tagger.tagSentence(tokenList.get(0));
 		
-		return tagger.tagSentence(tokenList.get(0));
+		for(TaggedWord s : twords)
+			System.out.println("Word: " + s.value() + " Tag: " + s.tag());
+		
+		return twords;
 	}
 	
 	//process each sentence using parser to get parse tree
@@ -70,7 +65,7 @@ public class Main {
 		return tree;
 	}
 	
-	public void spellCheck() {
+	private void spellCheck() {
 		
 	}
 

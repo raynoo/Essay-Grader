@@ -1,4 +1,4 @@
-package nlp.grader.main;
+package nlp.grader.objects;
 
 public class Rule {
 	private String lhs, rhs;

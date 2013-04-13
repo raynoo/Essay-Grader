@@ -1,14 +1,12 @@
 package nlp.grader.main;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import nlp.grader.objects.Rule;
 import nlp.grader.objects.Tags;
+import nlp.grader.utils.Reader;
 
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.trees.GrammaticalStructure;
@@ -25,7 +23,6 @@ public class Criteria {
 	public static boolean isVerbAgreeing(Tree tree) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		boolean agreement = true;
-		int numOfNsubj = 0;
 		
 		//get the dependency tree
 		TreebankLanguagePack tlp = new PennTreebankLanguagePack();
@@ -94,21 +91,9 @@ public class Criteria {
 		if(verbNounRules == null) {
 			verbNounRules = new ArrayList<Rule>();
 			
-			BufferedReader br = null;
-			String line;
-			
-			try {
-				br = new BufferedReader(new FileReader("rules/verb_noun_agreement_rules.txt"));
-				
-				while ((line = br.readLine()) != null) {
-					String[] rule = line.split("\\s");
-					verbNounRules.add(new Rule(rule[0], rule[1]));
-				}
-				
-				br.close();
-				
-			} catch(IOException ioe) {
-				ioe.printStackTrace();
+			for(String s : Reader.readFile("rules/verb_noun_agreement_rules.txt")) {
+				String[] rule = s.split("\\s");
+				verbNounRules.add(new Rule(rule[0], rule[1]));
 			}
 		}
 		return verbNounRules;

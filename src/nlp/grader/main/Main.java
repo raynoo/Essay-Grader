@@ -20,10 +20,7 @@ public class Main {
 	public static void main(String[] args) {
 		
 		Main main = new Main();
-		String input = "The strongest rain ever recorded " +
-				"in India shut down the financial hub of Mumbai, snapped communication lines, " +
-				"closed airports and forced thousands of people to sleep in their offices or walk " +
-				"home during the night, officials said today.";
+		String input = "My dog is usually good.";
 
 //		List<TaggedWord> twords = main.getWordTags(input);
 		

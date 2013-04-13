@@ -25,6 +25,7 @@ public class Criteria {
 	public static boolean isVerbAgreeing(Tree tree) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		boolean agreement = true;
+		int numOfNsubj = 0;
 		
 		//get the dependency tree
 		TreebankLanguagePack tlp = new PennTreebankLanguagePack();
@@ -37,10 +38,13 @@ public class Criteria {
 		TypedDependency[] list = td.toArray(new TypedDependency[0]);
 		
 		for(TypedDependency dep : list) {
-			if(dep.reln().getShortName().equals("nsubj")) {
+			if(dep.reln().getShortName().equals("nsubj") || dep.reln().getShortName().equals("cop")) {
 				nsubjs.add(dep);
 			}
 		}
+		
+		if(nsubjs.isEmpty())
+			return false;
 		
 		List<TaggedWord> taggedWords = tree.taggedYield();
 
@@ -64,13 +68,18 @@ public class Criteria {
 		return agreement;
 	}
 	
-	private static boolean isVerbAgreeing(String verbTag, String nounTag) {
+	private static boolean isVerbAgreeing(String lhs, String rhs) {
 		List<Rule> verbNounRules = getVerbNounRules();
 		
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
-		if(isVerbTag(verbTag)) {
+		if(isVerbTag(lhs)) {
 			for(Rule r : verbNounRules) {
-				if(r.lhs().equals(verbTag) && r.rhs().equals(nounTag))
+				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
+					return true;
+			}
+		} else if(isVerbTag(rhs)) {
+			for(Rule r : verbNounRules) {
+				if(r.lhs().equals(rhs) && r.rhs().equals(lhs))
 					return true;
 			}
 		}

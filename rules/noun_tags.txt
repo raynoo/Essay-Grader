@@ -1,4 +1,0 @@
-NN
-NNS
-NNP
-NNPS

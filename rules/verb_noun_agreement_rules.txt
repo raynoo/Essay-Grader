@@ -5,3 +5,5 @@ VBZ NNPS
 VBD NN
 VBD NNS
 VB NNS
+# handle cop verb
+# handle passive verb 	nsubjpass(sat-4, chair-2)  the chair was sat on

@@ -14,6 +14,11 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Criteria {
 	
+	/**
+	 * checks for verb-noun agreement of a sentence according to rules in rules/
+	 * @param sentence
+	 * @return number of errors in sentence
+	 */
 	public static int isVerbAgreeing(String sentence) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		List<TypedDependency> auxs = new ArrayList<TypedDependency>();
@@ -51,16 +56,6 @@ public class Criteria {
 		//rhs = TypedDependency's dependency word = noun
 		String lhs, rhs;
 		
-		//handle nsubj, nsubpass alone
-		if(!nsubjs.isEmpty()) {
-			for(TypedDependency dep : nsubjs) {
-				lhs = taggedWords.get(dep.gov().index()-1).tag();
-				rhs = taggedWords.get(dep.dep().index()-1).tag();
-				
-				if(!isVerbAgreeing(lhs, rhs))
-						errors++;
-			}
-		}
 		//handle nsubj with cop, aux, auxpass
 		if(!auxs.isEmpty()) {
 			for(TypedDependency depnsubj : nsubjs) {
@@ -73,6 +68,17 @@ public class Criteria {
 						if(!isVerbAgreeing(lhs, rhs))
 							errors++;
 					}
+				}
+			}
+		} else {
+			//handle nsubj, nsubpass alone
+			if(!nsubjs.isEmpty()) {
+				for(TypedDependency dep : nsubjs) {
+					lhs = taggedWords.get(dep.gov().index()-1).tag();
+					rhs = taggedWords.get(dep.dep().index()-1).tag();
+					
+					if(!isVerbAgreeing(lhs, rhs))
+						errors++;
 				}
 			}
 		}

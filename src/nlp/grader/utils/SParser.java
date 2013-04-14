@@ -35,7 +35,7 @@ public class SParser {
 		Tree tree = (Tree) lp.apply(sentence);
 
 		//depth is 1 when parsing is not possible.
-		System.out.println(tree.depth());
+//		System.out.println(tree.depth());
 
 		return tree;
 	}

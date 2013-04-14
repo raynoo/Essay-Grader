@@ -19,7 +19,6 @@ public class Reader {
 			while ((line = br.readLine()) != null &&
 					line != "" && line.charAt(0) != '#') {
 				lines.add(line);
-				System.out.println(line);
 			}
 			
 			br.close();

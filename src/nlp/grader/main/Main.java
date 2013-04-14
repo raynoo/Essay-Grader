@@ -20,12 +20,12 @@ public class Main {
 	public static void main(String[] args) {
 		
 		Main main = new Main();
-		String input = "My dog is usually good.";
+		String input = "bill has gone";
 
 //		List<TaggedWord> twords = main.getWordTags(input);
 		
 		Tree tree = main.getParseTree(input);
-		Criteria.isVerbAgreeing(tree);
+		System.out.println("\nVerb-Noun agreement: " + Criteria.isVerbAgreeing(tree));
 	}
 	
 	//process each sentence using pos tagger

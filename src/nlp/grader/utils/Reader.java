@@ -77,10 +77,18 @@ public class Reader {
 					}
 					else
 					{
+						String store;
 						if(pat3.matcher(temp[i]).find())
-							lines.add((temp[i] + ".").substring(1));
+							store = temp[i].substring(1);
 						else
-							lines.add(temp[i]+".");
+							store = temp[i];
+						
+						if(line.contains(store+"."))
+							lines.add(store+".");
+						else
+							lines.add(store);
+						
+						
 					}
 				}
 			}

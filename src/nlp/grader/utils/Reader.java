@@ -78,9 +78,9 @@ public class Reader {
 					else
 					{
 						if(pat3.matcher(temp[i]).find())
-							lines.add(temp[i].substring(1));
+							lines.add((temp[i] + ".").substring(1));
 						else
-							lines.add(temp[i]);
+							lines.add(temp[i]+".");
 					}
 				}
 			}

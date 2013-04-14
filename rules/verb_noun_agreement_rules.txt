@@ -1,9 +1,24 @@
+#NN	 	noun, singular or mass	 				table
+#NNS	noun plural	 							tables
+#NNP	proper noun, singular	 				John
+#NNPS	proper noun, plural	 					Vikings
+
+#VB	 	verb, base form	 						take
+#VBD	verb, past tense	 					took
+#VBG	verb, gerund/present participle	 		taking
+#VBN	verb, past participle	 				taken
+#VBP	verb, sing. present, non-3d	 			take
+#VBZ	verb, 3rd person sing. present	 		takes
+
 VBP NNS
 VBP NNPS
 VBZ NNS
 VBZ NNPS
+VBZ NNP
 VBZ NN
 VBN NN
 VBD NN
 VBD NNS
+VBD NNP
 VB NNS
+VBN NNP

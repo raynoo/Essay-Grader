@@ -1,6 +1,9 @@
 package nlp.grader.main;
 
+import java.io.File;
+
 import nlp.grader.objects.Essay;
+import nlp.grader.objects.Sentence;
 import nlp.grader.utils.Reader;
 
 /**
@@ -18,12 +21,21 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-		Essay essay = new Essay(Reader.readTestingFile("test_corpus/2.txt"));
-		Grader essayGrader = new Grader();
+		File corpusPath = new File("test_corpus");
 		
-		essayGrader.gradeEssay(essay);
+		for(File file : corpusPath.listFiles()) {
+			if(file.isFile()) {
+				Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
+				Grader essayGrader = new Grader();
+				
+				essayGrader.gradeEssay(essay);
+				System.out.println("\n--------------------------------------------\n");
+				
+			}
+		}
 		
-//		Sentence s = new Sentence("You are defeating me.");
+		
+//		Sentence s = new Sentence("Julie jump over the moon.");
 //		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
 //		System.out.println(Criteria.isVerbAgreeing(s));	
 	}

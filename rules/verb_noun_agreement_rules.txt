@@ -17,13 +17,19 @@ VBZ NNS
 VBZ NNPS
 VBZ NNP
 VBZ NN
+#TODO: but rule out PRP being i they you
+VBZ PRP
 VBN NN
 VBN NNP
+VBN PRP
 VBD NN
 VBD NNS
 VBD NNP
+VBD PRP
+#TODO: English/NNP, to/TO, help/VB here vb-nnp is correct but checker gets it wrong. so it shud be correct only if vb is preceded by to/det
 VB NNS
 VB NNS
 VB PRP
 MD PRP
 VBG PRP
+VBG NN

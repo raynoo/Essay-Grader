@@ -1,12 +1,11 @@
 #should be followed by some verb
 #MD
-#error rules for gerund:
-#PRP VBG
-#VB VBG
-#WP VBG
-#VBG VBG
-#MD VBG
-#NN VBG
 
+#VBP can be am. then vbn is wrong shud be vbg.
 VBP VBN
 VBP VBG
+TO VB
+VBZ VBG
+#does this work always? :
+VBZ VBD
+VBZ VBN

@@ -29,7 +29,8 @@ public class Grader {
 	 */
 	private void checkEssay(Essay essay) {
 		for(Sentence s : essay.getSentences()) {
-			System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
+			System.out.println("\n" + s);
+			System.out.println(Criteria.isVerbNounAgreeing(s));
 			System.out.println(Criteria.isVerbAgreeing(s));
 		}
 		

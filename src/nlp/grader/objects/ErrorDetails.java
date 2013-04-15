@@ -33,7 +33,6 @@ public class ErrorDetails
 		StringBuffer result = new StringBuffer("Total number of error of type " + typeOfError + " = " + errorCount);
 		
 		if(errorCount > 0) {
-			result.append("\n");
 			for(String s : errorMessage)
 				result.append("\t" + s);
 		}

@@ -47,7 +47,7 @@ public class Criteria {
 					prev = taggedWords.get(i-1);
 					
 					if(Rules.getVGerundErrorRules().contains(prev.tag())) {
-						errors1c.addError("Verb-Gerund do not agree. [" + prev.tag() + "-VBG]");
+						errors1c.addError("Verb-Gerund do not agree. [" + prev + "-" + word + "]");
 					}
 				}
 			}
@@ -63,7 +63,7 @@ public class Criteria {
 				rhs = taggedWords.get(dep.gov().index()-1).tag();
 				
 				if(!isVerbVerbAgreeing(lhs, rhs)) {
-					errors1c.addError("Verb-Verb do not agree. [" + lhs + "-" + rhs + "]");
+					errors1c.addError("Verb-Verb do not agree. [" + dep.dep() + lhs + "-" + dep.gov() + rhs + "]");
 				}
 			}
 		}
@@ -83,8 +83,9 @@ public class Criteria {
 				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
 					return true;
 			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	/**
@@ -96,6 +97,7 @@ public class Criteria {
 	public static ErrorDetails isVerbNounAgreeing(Sentence sentence) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		List<TypedDependency> auxs = new ArrayList<TypedDependency>();
+		List<TypedDependency> conj = new ArrayList<TypedDependency>();
 		
 		ErrorDetails errors1b;
 		
@@ -119,6 +121,8 @@ public class Criteria {
 				auxs.add(dep);
 			} else if(dep.reln().getShortName().equals("auxpass")) {
 				auxs.add(dep);
+			} else if(dep.reln().getShortName().equals("conj")) {
+				conj.add(dep);
 			}
 		}
 		
@@ -145,7 +149,9 @@ public class Criteria {
 						rhs = taggedWords.get(depnsubj.dep().index()-1).tag();
 						
 						if(!isVerbNounAgreeing(lhs, rhs)) {
-							errors1b.addError("Subject-Verb do not agree. [" + lhs + "-" + rhs + "]");
+							
+							if(!isConjPresent(lhs, rhs, depnsubj, conj))
+								errors1b.addError("Subject-Verb do not agree. [" + depaux.dep() + lhs + "-" + depnsubj.dep() + rhs + "]");
 						}
 					}
 				}
@@ -158,7 +164,9 @@ public class Criteria {
 				rhs = taggedWords.get(dep.dep().index()-1).tag();
 
 				if(isVerbTag(lhs) && !isVerbNounAgreeing(lhs, rhs)) {
-					errors1b.addError("Subject-Verb do not agree. [" + lhs + "-" + rhs + "]");
+					
+					if(!isConjPresent(lhs, rhs, dep, conj))
+						errors1b.addError("Subject-Verb do not agree. [" + dep.gov() + lhs + "-" + dep.dep() + rhs + "]");
 				}
 			}
 		}
@@ -166,8 +174,28 @@ public class Criteria {
 		return sentence.getErrors().get("1b");
 	}
 	
+	private static boolean isConjPresent(String lhs, String rhs, TypedDependency dep, List<TypedDependency> conj) {
+		if((rhs.equals("NN") || rhs.equals("NNP") || dep.dep().nodeString().equals("I") 
+				|| dep.dep().nodeString().equals("me") || dep.dep().nodeString().equals("he")
+				|| dep.dep().nodeString().equals("she"))		&& (lhs.equals("VBP") || lhs.equals("VBG"))) {
+
+			if(!conj.isEmpty()) {
+				for(TypedDependency d : conj) {
+					if(d.dep().nodeString().equals(dep.dep().nodeString()) ||
+							d.gov().nodeString().equals(dep.dep().nodeString()))
+						
+						return true;
+				}
+			}
+		}
+		return false;
+		
+	}
+	
 	private static boolean isVerbNounAgreeing(String lhs, String rhs) {
 		List<Rule> verbNounRules = Rules.getVerbNounRules();
+		
+		//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 		
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
 		if(isVerbTag(lhs)) {
@@ -175,8 +203,9 @@ public class Criteria {
 				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
 					return true;
 			}
+			return false;
 		}
-		return false;
+		return true;
 	}
 	
 	/**

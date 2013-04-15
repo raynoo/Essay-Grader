@@ -50,4 +50,8 @@ public class Sentence {
 		return this.parseErrors;
 	}
 	
+	@Override
+	public String toString() {
+		return this.sentence;
+	}
 }

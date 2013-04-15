@@ -46,44 +46,48 @@ public class Reader {
 		{			
 			br = new BufferedReader(new FileReader(filename));
 
-			while ( ( line = br.readLine() ) != null ) 
+			while ( (( line = br.readLine() ) != null) ) 
 			{
-				String temp[] = line.split("\\.");
+				if(line.length() > 0) {
+					String temp[] = line.split("\\.");
 
-				for( int i = 0 ; i < temp.length ; i++ )
-				{
-					if(pat.matcher(temp[i]).find())
+					for( int i = 0 ; i < temp.length ; i++ )
 					{
-						String store = temp[i];
-						int k = i+1;
-						while(k<temp.length)
+						if(pat.matcher(temp[i]).find())
 						{
-							if( pat1.matcher(temp[k]).find() || pat2.matcher(temp[k]).find())
+							String store = temp[i];
+							int k = i+1;
+							while(k<temp.length)
 							{
-								store = store + "." + temp[k];
-								i=k;
-								k++;
+								if( pat1.matcher(temp[k]).find() || pat2.matcher(temp[k]).find())
+								{
+									store = store + "." + temp[k];
+									i=k;
+									k++;
+								}
+								else
+									break;
 							}
-							else
-								break;
-						}
-						
-						lines.add(store+".");
-					}
-					else
-					{
-						String store;
-						if(pat3.matcher(temp[i]).find())
-							store = temp[i].substring(1);
-						else
-							store = temp[i];
-						
-						if(line.contains(store+"."))
+
 							lines.add(store+".");
+						}
 						else
-							lines.add(store);
-						
-						
+						{
+							String store;
+							if(pat3.matcher(temp[i]).find())
+								store = temp[i].substring(1);
+							else
+								store = temp[i];
+
+							if(line.contains(store+"."))
+								lines.add(store+".");
+							else
+								if(!store.equals(" "))
+									lines.add(store);
+
+
+						}
+
 					}
 				}
 			}

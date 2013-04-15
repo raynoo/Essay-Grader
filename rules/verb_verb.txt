@@ -1,1 +1,9 @@
-MD #should be followed by some verb
+#should be followed by some verb
+MD
+#error rules for gerund:
+PRP VBG
+VB VBG
+WP VBG
+VBG VBG
+MD VBG
+NN VBG

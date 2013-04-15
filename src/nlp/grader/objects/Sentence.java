@@ -1,6 +1,7 @@
 package nlp.grader.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.trees.Tree;
@@ -15,10 +16,12 @@ public class Sentence {
 	
 	private String sentence;
 	private SParser parser;
+	private HashMap<String, ErrorDetails> parseErrors;
 	
 	public Sentence(String sentence) {
 		this.sentence = sentence;
 		this.parser = new SParser(this.sentence);
+		this.parseErrors = new HashMap<String, ErrorDetails>();
 	}
 	
 	public Tree getParseTree() {
@@ -39,6 +42,10 @@ public class Sentence {
 	
 	public void getTags() {
 		
+	}
+	
+	public HashMap<String, ErrorDetails> getErrors() {
+		return this.parseErrors;
 	}
 	
 }

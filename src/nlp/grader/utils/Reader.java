@@ -4,13 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.process.DocumentPreprocessor;
 
 public class Reader {
 
@@ -22,9 +17,9 @@ public class Reader {
 		try {
 			br = new BufferedReader(new FileReader(filename));
 
-			while ((line = br.readLine()) != null &&
-					line != "" && line.charAt(0) != '#') {
-				lines.add(line);
+			while ((line = br.readLine()) != null) {
+				if(line.length() > 0 && line.charAt(0) != '#')
+					lines.add(line);
 			}
 
 			br.close();

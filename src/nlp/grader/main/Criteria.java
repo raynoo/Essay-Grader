@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import nlp.grader.objects.ErrorDetails;
 import nlp.grader.objects.Rule;
 import nlp.grader.objects.Rules;
 import nlp.grader.objects.Sentence;
@@ -14,26 +15,34 @@ import edu.stanford.nlp.trees.TypedDependency;
 
 public class Criteria {
 	
-	public static int isVerbAgreeing(Sentence sentence) {
-		int errors = 0;
+	public static ErrorDetails isVerbAgreeing(Sentence sentence) {
+		ErrorDetails errors1c;
+		
+		if(sentence.getErrors().containsKey("1c"))
+			errors1c = sentence.getErrors().get("1c");
+		else
+			errors1c = new ErrorDetails("1c");
 		
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
 		int i = 0;
+		
 		for(Iterator<TaggedWord> iter = taggedWords.iterator(); iter.hasNext(); i++) {
 			TaggedWord word = iter.next();
 			TaggedWord prev = null;
 			
+			//if gerund is present, check if preceding tag is among blacklisted tags
 			if(word.tag().equals("VBG")) {
 				if(i-1 >= 0) {
 					prev = taggedWords.get(i-1);
 					
 					if(Rules.getVGerundErrorRules().contains(prev.tag())) {
-						errors++;
+						errors1c.addError("Verb-Gerund do not agree. [" + prev.tag() + "-VBG]");
 					}
 				}
 			}
 		}
-		return errors;
+		sentence.getErrors().put("1c", errors1c);
+		return sentence.getErrors().get("1c");
 	}
 	
 	/**
@@ -41,11 +50,16 @@ public class Criteria {
 	 * @param sentence
 	 * @return number of errors in sentence
 	 */
-	public static int isVerbNounAgreeing(Sentence sentence) {
+	public static ErrorDetails isVerbNounAgreeing(Sentence sentence) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		List<TypedDependency> auxs = new ArrayList<TypedDependency>();
 		
-		int errors = 0;
+		ErrorDetails errors1b;
+		
+		if(sentence.getErrors().containsKey("1b"))
+			errors1b = sentence.getErrors().get("1b");
+		else
+			errors1b = new ErrorDetails("1b");
 		
 		//get the dependency tree (in list form)
 		TypedDependency[] list = sentence.getDependencyTree();
@@ -67,7 +81,9 @@ public class Criteria {
 		
 		//if none are present, grammar is wrong
 		if(nsubjs.isEmpty()) {
-			return ++errors;
+			errors1b.addError("No Subject-Verb relation present.");
+			sentence.getErrors().put("1b", errors1b);
+			return sentence.getErrors().get("1b");
 		}
 		
 		//list of words and its tags. to get the tag of a given word.
@@ -85,8 +101,9 @@ public class Criteria {
 						lhs = taggedWords.get(depaux.dep().index()-1).tag();
 						rhs = taggedWords.get(depnsubj.dep().index()-1).tag();
 						
-						if(!isVerbNounAgreeing(lhs, rhs))
-							errors++;
+						if(!isVerbNounAgreeing(lhs, rhs)) {
+							errors1b.addError("Subject-Verb do not agree. [" + lhs + "-" + rhs + "]");
+						}
 					}
 				}
 			}
@@ -97,11 +114,13 @@ public class Criteria {
 				lhs = taggedWords.get(dep.gov().index()-1).tag();
 				rhs = taggedWords.get(dep.dep().index()-1).tag();
 
-				if(isVerbTag(lhs) && !isVerbNounAgreeing(lhs, rhs))
-					errors++;
+				if(isVerbTag(lhs) && !isVerbNounAgreeing(lhs, rhs)) {
+					errors1b.addError("Subject-Verb do not agree. [" + lhs + "-" + rhs + "]");
+				}
 			}
 		}
-		return errors;
+		sentence.getErrors().put("1b", errors1b);
+		return sentence.getErrors().get("1b");
 	}
 	
 	private static boolean isVerbNounAgreeing(String lhs, String rhs) {

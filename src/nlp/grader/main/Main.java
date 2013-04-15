@@ -18,11 +18,10 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-		String input = "Dole will defeating me";
-		Sentence s = new Sentence(input);
+		Sentence s = new Sentence("You is defeating cooking me.");
 		
-		System.out.println("\n1b Verb-Noun agreement: " + Criteria.isVerbNounAgreeing(s));
-		System.out.println("1c Verb Gerund agreement: " + Criteria.isVerbAgreeing(s));
+		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
+		System.out.println(Criteria.isVerbAgreeing(s));	
 		
 		Reader.readTestingFile("test_corpus/2.txt");
 	}

@@ -2,3 +2,4 @@ NN
 NNS
 NNP
 NNPS
+PRP

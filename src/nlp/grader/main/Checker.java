@@ -15,9 +15,9 @@ public class Checker {
 	 */
 	public void checkEssay(String essay) {
 		
-		for(String sentence : essay.split(".\\s*")) {
-			Criteria.isVerbNounAgreeing(sentence);
-			
-		}
+//		for(String sentence : essay.split(".\\s*")) {
+//			Criteria.isVerbNounAgreeing(sentence);
+//			
+//		}
 	}
 }

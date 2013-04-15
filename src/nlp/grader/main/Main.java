@@ -1,5 +1,6 @@
 package nlp.grader.main;
 
+import nlp.grader.objects.Sentence;
 import nlp.grader.utils.Reader;
 
 /**
@@ -17,16 +18,13 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
-		String input = "Dole are defeat me";
+		String input = "Dole will defeating me";
+		Sentence s = new Sentence(input);
 		
-		System.out.println("\n1b Verb-Noun agreement: " + Criteria.isVerbAgreeing(input));
-		
+		System.out.println("\n1b Verb-Noun agreement: " + Criteria.isVerbNounAgreeing(s));
+		System.out.println("1c Verb Gerund agreement: " + Criteria.isVerbAgreeing(s));
 		
 		Reader.readTestingFile("test_corpus/2.txt");
 	}
 	
-	private void spellCheck() {
-		
-	}
-
 }

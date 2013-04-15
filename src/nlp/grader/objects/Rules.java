@@ -1,12 +1,18 @@
 package nlp.grader.objects;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import nlp.grader.utils.Reader;
 
 public class Rules {
+	
 	private static List<Rule> verbNounRules = null;
+	//blacklisted tags that (should not) appear preceding a gerund
+	private static String[] gerundRules = { "PRP", "VB", "WP", "VBG", "MD", "NN" };
 	
 	public static List<Rule> getVerbNounRules() {
 		if(verbNounRules == null) {
@@ -18,5 +24,9 @@ public class Rules {
 			}
 		}
 		return verbNounRules;
+	}
+	
+	public static Set<String> getVGerundErrorRules() {
+		return new HashSet<String>(Arrays.asList(gerundRules));
 	}
 }

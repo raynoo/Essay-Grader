@@ -101,8 +101,8 @@ public class Reader {
 			e.printStackTrace();
 		}
 
-		for(String st : lines)
-			System.out.println(st);
+//		for(String st : lines)
+//			System.out.println(st);
 		return lines;
 	}
 }

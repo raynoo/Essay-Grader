@@ -1,34 +1,54 @@
 package nlp.grader.main;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import nlp.grader.objects.Rule;
 import nlp.grader.objects.Rules;
+import nlp.grader.objects.Sentence;
 import nlp.grader.objects.Tags;
-import nlp.grader.utils.SParser;
 
 import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;
 
 public class Criteria {
+	
+	public static int isVerbAgreeing(Sentence sentence) {
+		int errors = 0;
+		
+		List<TaggedWord> taggedWords = sentence.getTaggedWords();
+		int i = 0;
+		for(Iterator<TaggedWord> iter = taggedWords.iterator(); iter.hasNext(); i++) {
+			TaggedWord word = iter.next();
+			TaggedWord prev = null;
+			
+			if(word.tag().equals("VBG")) {
+				if(i-1 >= 0) {
+					prev = taggedWords.get(i-1);
+					
+					if(Rules.getVGerundErrorRules().contains(prev.tag())) {
+						errors++;
+					}
+				}
+			}
+		}
+		return errors;
+	}
 	
 	/**
 	 * checks for verb-noun agreement of a sentence according to rules in rules/
 	 * @param sentence
 	 * @return number of errors in sentence
 	 */
-	public static int isVerbAgreeing(String sentence) {
+	public static int isVerbNounAgreeing(Sentence sentence) {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		List<TypedDependency> auxs = new ArrayList<TypedDependency>();
 		
 		int errors = 0;
 		
-		//get parse tree
-		Tree tree = SParser.getParseTree(sentence);
 		//get the dependency tree (in list form)
-		TypedDependency[] list = SParser.getDependencyTree(tree);
+		TypedDependency[] list = sentence.getDependencyTree();
 		
 		//collect all nsubj, cop, nsubjpass dependencies
 		for(TypedDependency dep : list) {
@@ -46,12 +66,12 @@ public class Criteria {
 		}
 		
 		//if none are present, grammar is wrong
-		if(nsubjs.isEmpty() && auxs.isEmpty()) {
+		if(nsubjs.isEmpty()) {
 			return ++errors;
 		}
 		
 		//list of words and its tags. to get the tag of a given word.
-		List<TaggedWord> taggedWords = tree.taggedYield();
+		List<TaggedWord> taggedWords = sentence.getTaggedWords();
 		//lhs = TypedDependency's governor word = verb
 		//rhs = TypedDependency's dependency word = noun
 		String lhs, rhs;
@@ -65,27 +85,26 @@ public class Criteria {
 						lhs = taggedWords.get(depaux.dep().index()-1).tag();
 						rhs = taggedWords.get(depnsubj.dep().index()-1).tag();
 						
-						if(!isVerbAgreeing(lhs, rhs))
+						if(!isVerbNounAgreeing(lhs, rhs))
 							errors++;
 					}
 				}
 			}
-		} else {
-			//handle nsubj, nsubpass alone
-			if(!nsubjs.isEmpty()) {
-				for(TypedDependency dep : nsubjs) {
-					lhs = taggedWords.get(dep.gov().index()-1).tag();
-					rhs = taggedWords.get(dep.dep().index()-1).tag();
-					
-					if(!isVerbAgreeing(lhs, rhs))
-						errors++;
-				}
+		}
+		//handle nsubj, nsubpass alone
+		if(!nsubjs.isEmpty()) {
+			for(TypedDependency dep : nsubjs) {
+				lhs = taggedWords.get(dep.gov().index()-1).tag();
+				rhs = taggedWords.get(dep.dep().index()-1).tag();
+
+				if(isVerbTag(lhs) && !isVerbNounAgreeing(lhs, rhs))
+					errors++;
 			}
 		}
 		return errors;
 	}
 	
-	private static boolean isVerbAgreeing(String lhs, String rhs) {
+	private static boolean isVerbNounAgreeing(String lhs, String rhs) {
 		List<Rule> verbNounRules = Rules.getVerbNounRules();
 		
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.

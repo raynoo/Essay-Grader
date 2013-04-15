@@ -13,8 +13,18 @@ import nlp.grader.objects.Tags;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.trees.TypedDependency;
 
+/**
+ * Performs necessary checks for grading criteria 1b, 1c
+ * @author renus
+ *
+ */
 public class Criteria {
 	
+	/**
+	 * Criteria 1c
+	 * @param sentence
+	 * @return
+	 */
 	public static ErrorDetails isVerbAgreeing(Sentence sentence) {
 		ErrorDetails errors1c;
 		
@@ -26,6 +36,7 @@ public class Criteria {
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
 		int i = 0;
 		
+		//check for verb-gerund sequence
 		for(Iterator<TaggedWord> iter = taggedWords.iterator(); iter.hasNext(); i++) {
 			TaggedWord word = iter.next();
 			TaggedWord prev = null;
@@ -41,11 +52,43 @@ public class Criteria {
 				}
 			}
 		}
+		
+		String lhs, rhs;
+		
+		//check for aux dependency of 2 verbs
+		TypedDependency[] list = sentence.getDependencyTree();
+		for(TypedDependency dep : list) {
+			if(dep.reln().getShortName().equals("aux")) {
+				lhs = taggedWords.get(dep.dep().index()-1).tag();
+				rhs = taggedWords.get(dep.gov().index()-1).tag();
+				
+				if(!isVerbVerbAgreeing(lhs, rhs)) {
+					errors1c.addError("Verb-Verb do not agree. [" + lhs + "-" + rhs + "]");
+				}
+			}
+		}
+		
+		//any other verb-verb combinations?
+		
 		sentence.getErrors().put("1c", errors1c);
 		return sentence.getErrors().get("1c");
 	}
 	
+	public static boolean isVerbVerbAgreeing(String lhs, String rhs) {
+		List<Rule> verbVerbRules = Rules.getVerbVerbRules();
+		
+		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
+		if(isVerbTag(lhs)) {
+			for(Rule r : verbVerbRules) {
+				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
+					return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
+	 * Criteria 1b
 	 * checks for verb-noun agreement of a sentence according to rules in rules/
 	 * @param sentence
 	 * @return number of errors in sentence
@@ -136,10 +179,20 @@ public class Criteria {
 		return false;
 	}
 	
+	/**
+	 * Is a tag that of a verb?
+	 * @param tag
+	 * @return
+	 */
 	private static boolean isVerbTag(String tag) {
 		return Tags.getVerbTags().contains(tag);
 	}
 	
+	/**
+	 * Is a tag that of a noun?
+	 * @param tag
+	 * @return
+	 */
 	private static boolean isNounTag(String tag) {
 		return Tags.getNounTags().contains(tag);
 	}

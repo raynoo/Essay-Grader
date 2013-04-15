@@ -1,6 +1,6 @@
 package nlp.grader.main;
 
-import nlp.grader.objects.Sentence;
+import nlp.grader.objects.Essay;
 import nlp.grader.utils.Reader;
 
 /**
@@ -12,18 +12,20 @@ import nlp.grader.utils.Reader;
 public class Main {
 
 	/**
-	 * TODO: Read from file and calls Checker and Grader
+	 * Read from input file and passes essay to Grader to get final grade.
 	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		
-		Sentence s = new Sentence("You is defeating cooking me.");
+		Essay essay = new Essay(Reader.readTestingFile("test_corpus/2.txt"));
+		Grader essayGrader = new Grader();
 		
-		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
-		System.out.println(Criteria.isVerbAgreeing(s));	
+		essayGrader.gradeEssay(essay);
 		
-		Reader.readTestingFile("test_corpus/2.txt");
+//		Sentence s = new Sentence("You are defeating me.");
+//		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
+//		System.out.println(Criteria.isVerbAgreeing(s));	
 	}
 	
 }

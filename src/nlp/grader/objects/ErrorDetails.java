@@ -14,7 +14,6 @@ public class ErrorDetails
 		this.typeOfError = typeOfError;
 	}
 
-
 	public void addError(String message)
 	{
 		if(message != null)
@@ -31,8 +30,15 @@ public class ErrorDetails
 	@Override
 	public String toString() 
 	{
-		String result = "Total number of error of type " + typeOfError + " = " + errorCount; 
-		return result;
+		StringBuffer result = new StringBuffer("Total number of error of type " + typeOfError + " = " + errorCount);
+		
+		if(errorCount > 0) {
+			result.append("\n");
+			for(String s : errorMessage)
+				result.append("\t" + s);
+		}
+		
+		return result.toString();
 	}
 
 }

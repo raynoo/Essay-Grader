@@ -12,20 +12,18 @@
 
 VBP NNS
 VBP NNPS
+VBP PRP
 VBZ NNS
 VBZ NNPS
 VBZ NNP
 VBZ NN
 VBN NN
+VBN NNP
 VBD NN
 VBD NNS
 VBD NNP
 VB NNS
-VBN NNP
 VB NNS
-MD PRP
 VB PRP
+MD PRP
 VBG PRP
-VBP PRP
-# handle cop verb
-# handle passive verb 	nsubjpass(sat-4, chair-2)  the chair was sat on

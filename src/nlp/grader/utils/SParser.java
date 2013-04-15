@@ -1,4 +1,4 @@
-package nlp.grader.objects;
+package nlp.grader.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

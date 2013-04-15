@@ -3,6 +3,8 @@ package nlp.grader.objects;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import nlp.grader.utils.SParser;
+
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TypedDependency;

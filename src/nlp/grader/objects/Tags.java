@@ -14,6 +14,8 @@ public class Tags {
 	private static HashSet<String> verbTags = null;
 	private static HashSet<String> nounTags = null;
 	
+	private static String[] personalPRPTags = {"i", "you", "they"};
+	
 	public static HashSet<String> getVerbTags() {
 		if(verbTags == null) {
 			verbTags = new HashSet<String>();

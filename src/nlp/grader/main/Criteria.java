@@ -68,12 +68,34 @@ public class Criteria {
 			}
 		}
 		
-		//any other verb-verb combinations?
+		//parse through sentence to get consecutive verb-verb pairs that are not covered in aux's
+		for(int j = 0; j < taggedWords.size() && j+1 < taggedWords.size(); j++) {
+			TaggedWord firstVerb = taggedWords.get(j), secondVerb = taggedWords.get(j+1);
+			
+			if(firstVerb.tag().equals("MD") && !isVerbTag(secondVerb.tag())) {
+				//if MD is encountered, then next word should be a verbtag
+				errors1c.addError("Missing Verb. A verb should follow a modal. [" + firstVerb + "]");
+			}
+			
+			//any other verb-verb combinations?
+			if(isVerbTag(firstVerb.tag()) && isVerbTag(secondVerb.tag())) {
+				if(!isVerbVerbAgreeing(secondVerb.tag(), firstVerb.tag())) {
+					errors1c.addError("Other: Verb-Verb do not agree. [" + firstVerb + "-" + secondVerb + "]");
+				}
+			}
+		}
 		
+		//put back all errors
 		sentence.getErrors().put("1c", errors1c);
 		return sentence.getErrors().get("1c");
 	}
 	
+	/**
+	 * Check if 2 tags (lhs = verb rhs = verb) agree as per verb-verb agreement rules
+	 * @param lhs
+	 * @param rhs
+	 * @return agreement
+	 */
 	public static boolean isVerbVerbAgreeing(String lhs, String rhs) {
 		List<Rule> verbVerbRules = Rules.getVerbVerbRules();
 		
@@ -149,8 +171,13 @@ public class Criteria {
 						rhs = taggedWords.get(depnsubj.dep().index()-1).tag();
 						
 						if(!isVerbNounAgreeing(lhs, rhs)) {
-							
+							//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 							if(!isConjPresent(lhs, rhs, depnsubj, conj))
+								errors1b.addError("Subject-Verb do not agree. [" + depaux.dep() + lhs + "-" + depnsubj.dep() + rhs + "]");
+						} else {
+							//check for wrong combinations
+							//check if rhs is prp -> he/she -> lhs shud be singular
+							if(!isPRPAgreeing(taggedWords.get(depaux.dep().index()-1), taggedWords.get(depnsubj.dep().index()-1)))
 								errors1b.addError("Subject-Verb do not agree. [" + depaux.dep() + lhs + "-" + depnsubj.dep() + rhs + "]");
 						}
 					}
@@ -163,21 +190,72 @@ public class Criteria {
 				lhs = taggedWords.get(dep.gov().index()-1).tag();
 				rhs = taggedWords.get(dep.dep().index()-1).tag();
 
-				if(isVerbTag(lhs) && !isVerbNounAgreeing(lhs, rhs)) {
-					
+				if(!isVerbNounAgreeing(lhs, rhs)) {
+					//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 					if(!isConjPresent(lhs, rhs, dep, conj))
+						errors1b.addError("Subject-Verb do not agree. [" + dep.gov() + lhs + "-" + dep.dep() + rhs + "]");
+				} else {
+					//check for wrong combinations
+					//check if rhs is prp -> he/she -> lhs shud be singular
+					if(!isPRPAgreeing(taggedWords.get(dep.gov().index()-1), taggedWords.get(dep.dep().index()-1)))
 						errors1b.addError("Subject-Verb do not agree. [" + dep.gov() + lhs + "-" + dep.dep() + rhs + "]");
 				}
 			}
 		}
+		//parse through sentence to get consecutive noun-verb pairs
+		for(int i = 0; i < taggedWords.size(); i++) {
+			if(isNounTag(taggedWords.get(i).tag()) 
+					&& i != taggedWords.size()-1 && isVerbTag(taggedWords.get(i+1).tag())) {
+				
+				TaggedWord noun = taggedWords.get(i), verb = taggedWords.get(i+1);
+				boolean alreadyProcessed = false;
+				
+				//has this noun been processed earlier, as part of nsubj?
+				for(TypedDependency td : nsubjs) {
+					if(td.dep().value().equals(noun.value()))
+						alreadyProcessed = true;
+				}
+				//if not, then what are you waiting for? check agreement for this pair!
+				if(!alreadyProcessed && !isVerbNounAgreeing(verb.tag(), noun.tag())) {
+					errors1b.addError("Subject-Verb do not agree. [" + noun + "-" + verb + "]");
+				}
+			}
+		}
+		
+		//put back all errors
 		sentence.getErrors().put("1b", errors1b);
 		return sentence.getErrors().get("1b");
 	}
 	
+	/**
+	 * Check verb agreement for personal pronouns 
+	 * @param lhs
+	 * @param rhs
+	 * @return
+	 */
+	private static boolean isPRPAgreeing(TaggedWord lhs, TaggedWord rhs) {
+		if(lhs.tag().equals("VBZ") && rhs.tag().equals("PRP")) {
+			//if not he/she, the verb cannot be vbz
+			if(!(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she")))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks for a conjunction with given verb-noun pair, where noun is a personal pronoun
+	 * @param lhs
+	 * @param rhs
+	 * @param dep
+	 * @param conj
+	 * @return
+	 */
 	private static boolean isConjPresent(String lhs, String rhs, TypedDependency dep, List<TypedDependency> conj) {
-		if((rhs.equals("NN") || rhs.equals("NNP") || dep.dep().nodeString().equals("I") 
-				|| dep.dep().nodeString().equals("me") || dep.dep().nodeString().equals("he")
-				|| dep.dep().nodeString().equals("she"))		&& (lhs.equals("VBP") || lhs.equals("VBG"))) {
+		//personal pronouns can have vbp and vbg only if it is part of a conjunction
+		if((rhs.equals("NN") || rhs.equals("NNP") 
+				|| dep.dep().nodeString().equalsIgnoreCase("i") || dep.dep().nodeString().equalsIgnoreCase("me") 
+				|| dep.dep().nodeString().equalsIgnoreCase("he") || dep.dep().nodeString().equalsIgnoreCase("she"))
+			&& (lhs.equals("VBP") || lhs.equals("VBG"))) {
 
 			if(!conj.isEmpty()) {
 				for(TypedDependency d : conj) {
@@ -189,13 +267,16 @@ public class Criteria {
 			}
 		}
 		return false;
-		
 	}
 	
+	/**
+	 * Check if 2 tags (lhs = verb rhs = noun) agree as per verb-noun agreement rules
+	 * @param lhs
+	 * @param rhs
+	 * @return agreement
+	 */
 	private static boolean isVerbNounAgreeing(String lhs, String rhs) {
 		List<Rule> verbNounRules = Rules.getVerbNounRules();
-		
-		//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 		
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
 		if(isVerbTag(lhs)) {

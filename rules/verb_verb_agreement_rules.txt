@@ -1,11 +1,10 @@
-#should be followed by some verb
-#MD
-
 #VBP can be am. then vbn is wrong shud be vbg.
 VBP VBN
 VBP VBG
-TO VB
 VBZ VBG
-#does this work always? :
+
+#does this work always?
 VBZ VBD
 VBZ VBN
+#VBD VBN
+VBN VBD

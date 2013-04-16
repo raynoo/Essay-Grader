@@ -13,7 +13,7 @@ public class Rules {
 	private static List<Rule> verbNounRules = null;
 	private static List<Rule> verbVerbRules = null;
 	//blacklisted tags that (should not) appear preceding a gerund
-	private static String[] gerundRules = { "PRP", "VB", "WP", "VBG", "MD", "NN" };
+	private static String[] gerundRules = { "PRP", "VB", "WP", "VBG", "MD", "NN", "VBD" };
 	
 	public static List<Rule> getVerbNounRules() {
 		if(verbNounRules == null) {

@@ -21,23 +21,38 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		
+		
+		
 		File corpusPath = new File("test_corpus");
 		
 		for(File file : corpusPath.listFiles()) {
 			if(file.isFile()) {
+				System.out.println(file.getName());
 				Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
-				Grader essayGrader = new Grader();
 				
-				essayGrader.gradeEssay(essay);
+				for(Sentence sentence :essay.getSentences()){
+					Criteria.isVerbAgreeing(sentence);
+					Criteria.isVerbNounAgreeing(sentence);
+					WordOrder.getWordOrderErrors(sentence);
+					
+					System.out.println(sentence);
+					sentence.printAllErrors();
+					
+					
+
+				}
 				System.out.println("\n--------------------------------------------\n");
 				
 			}
 		}
 		
 		
-//		Sentence s = new Sentence("Julie jump over the moon.");
-//		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
-//		System.out.println(Criteria.isVerbAgreeing(s));	
+		
+		
+//		Sentence s = new Sentence("I like to running");
+//		WordOrder.getWordOrderErrors(s);
+////		System.out.println("\n" + Criteria.isVerbNounAgreeing(s));
+////		System.out.println(Criteria.isVerbAgreeing(s));	
 	}
 	
 }

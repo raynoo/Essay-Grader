@@ -19,7 +19,7 @@ public class SParser {
 	public SParser(String s) {
 		this.inputSentence = s;
 		this.parseTree = SParserConfig.getLexParser().apply(inputSentence);
-		System.out.println(parseTree.taggedYield());
+		//System.out.println(parseTree.taggedYield());
 		
 		GrammaticalStructureFactory gsf = new PennTreebankLanguagePack().grammaticalStructureFactory();
 		Collection<TypedDependency> td = gsf.newGrammaticalStructure(this.parseTree).typedDependenciesCollapsed();

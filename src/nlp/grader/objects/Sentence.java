@@ -50,6 +50,16 @@ public class Sentence {
 		return this.parseErrors;
 	}
 	
+	
+	public void printAllErrors()
+	{
+		for(String key :  parseErrors.keySet())
+		{
+			System.out.println(parseErrors.get(key).toString());
+		}
+	}
+	
+	// ************never change this ********************8
 	@Override
 	public String toString() {
 		return this.sentence;

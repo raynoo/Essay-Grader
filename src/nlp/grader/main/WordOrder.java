@@ -28,13 +28,15 @@ public class WordOrder {
 		ErrorDetails ed = sentence.getErrors().get("1a");
 
 		if(ed == null)
+		{
 			ed = new ErrorDetails("1 A");
+			sentence.getErrors().put("1a", ed);
+		}		
 
-		sentence.getErrors().put("1a", ed);
-
-		//		basicCheck(sentence,ed);
-		//		twoPronoun(sentence,ed);
+		basicCheck(sentence,ed);
+		twoPronoun(sentence,ed);
 		checkConjunction(sentence,ed);
+		checkTo(sentence, ed);
 
 
 		//System.out.println(ed.toString());
@@ -69,7 +71,6 @@ public class WordOrder {
 				ed.addError("after ADVP there is no comma");
 			}
 		}
-
 		else if (!label.equals("NP"))
 		{
 			ed.addError("The starting tag is not correct");
@@ -125,9 +126,9 @@ public class WordOrder {
 		while(m.find())
 		{
 			String sub = sen.subSequence(m.start(), m.end()).toString();
-			if( !sub.contains(",") && !sub.contains("CC"))
+			if( !sub.contains(",") && !sub.contains("CC") && !sub.contains("VB"))
 			{
-				ed.addError("Two pronoun without , or conjunction");
+				ed.addError("Two pronoun without , or conjunction or verb");
 			}
 		}
 
@@ -143,10 +144,33 @@ public class WordOrder {
 		return 0;
 	}
 
-	public int checkTo()
+	private static void checkTo(Sentence sentence,ErrorDetails ed)
 	{
 		// after To there can be only base form of the verb
-		return 0;
+
+		boolean findTo = false;
+		Pattern p = Pattern.compile("^to/TO");
+
+		for(TaggedWord taggedWord : sentence.getTaggedWords() )
+		{
+
+			if( p.matcher(taggedWord.toString()).find())
+			{
+
+				findTo = true;
+			}
+			else if(findTo)
+			{
+				findTo = false;
+				if(taggedWord.toString().contains("/VB") && !taggedWord.tag().equals("VB"))
+				{
+
+					ed.addError("after \" to \" there should be base form of the verb");
+				}
+			}
+
+
+		}
 	}
 
 	private static void checkConjunction(Sentence sentence,ErrorDetails ed)
@@ -160,23 +184,28 @@ public class WordOrder {
 			if(label.contains("CC"))
 			{
 				List<Tree> child = t.siblings(sentence.getParseTree());
-				
+
 				String otherTag = null;
 				for(int i = 0 ; i <  child.size(); i++ )
 				{
 					String tag = child.get(i).label().value();
-					
+
+					if(tag.contains("NN"))
+					{
+						tag = "NN";
+					}
+
 					if(otherTag == null && !tag.contains("CC") && !tag.contains(","))
 					{
 						otherTag = tag;
 					}
-					else if(otherTag != null && !tag.contains("CC") && !tag.contains(","))
+					else if(otherTag != null && !tag.contains("CC") && !tag.contains(",") && !tag.contains("."))
 					{
 						if(!otherTag.equals(tag))
 						{
-							System.out.println("###############");
-							System.out.println(sentence + "  **" + otherTag + "**" + tag );
-							ed.addError("Conjunction should and members of the same type");
+//							System.out.println("###############");
+//							System.out.println(sentence + "  **" + otherTag + "**" + tag );
+							ed.addError("Conjunction should join members of the same type ");
 							break;
 						}
 					}

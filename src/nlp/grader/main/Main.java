@@ -62,9 +62,8 @@ public class Main {
 			Criteria.isVerbAgreeing(s);
 			
 			s.printAllErrors();
-			
-			System.out.println("\n--------------------------------------------\n");
 		}
+		System.out.println("\n--------------------------------------------\n");
 	}
 	
 	/**

@@ -1,6 +1,12 @@
 package nlp.grader.main;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,6 +27,35 @@ public class WordOrder {
 
 	private final String[] TRANSITIVE_VERB   = {"bring","cost","give","lend","offer","pass","play","read","send","sing","teach","write","buy","get","leave","make","owe","pay","promise","refuse","show","take","tell",}; // sentence should have a object
 
+	static HashMap<String, Set<String> > orderPair;
+	static
+	{
+		orderPair = new HashMap<String, Set<String>>();
+		try
+		{
+			BufferedReader br = new BufferedReader(new FileReader("rules/word_order_rules"));
+			String line;
+			while((line = br.readLine()) != null)
+			{
+				String tag1 = line.split("\\s+")[0];
+				String tag2 = line.split("\\s+")[1];
+				Set<String> toAdd;
+
+				if( (toAdd = orderPair.get(tag1) ) == null )
+				{
+					toAdd = new HashSet<String>();
+					orderPair.put(tag1, toAdd);
+				}
+
+				toAdd.add(tag2);
+
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 
 	public static void getWordOrderErrors(Sentence sentence)
@@ -29,14 +64,15 @@ public class WordOrder {
 
 		if(ed == null)
 		{
-			ed = new ErrorDetails("1 A");
+			ed = new ErrorDetails("1a");
 			sentence.getErrors().put("1a", ed);
 		}		
 
-		basicCheck(sentence,ed);
-		twoPronoun(sentence,ed);
-		checkConjunction(sentence,ed);
-		checkTo(sentence, ed);
+		//		basicCheck(sentence,ed);
+		//		twoPronoun(sentence,ed);
+		//		checkConjunction(sentence,ed);
+		//		checkTo(sentence, ed);
+		checkWordOrderRules(sentence, ed);
 
 
 		//System.out.println(ed.toString());
@@ -173,6 +209,24 @@ public class WordOrder {
 		}
 	}
 
+	private static void checkWordOrderRules(Sentence sentence , ErrorDetails ed)
+	{
+		for(int i = 0 ,n = sentence.getTaggedWords().size(); i < n ; i++)
+		{
+			if(i+1 < n)
+			{
+				String tag1 = sentence.getTaggedWords().get(i).tag();
+				String tag2 = sentence.getTaggedWords().get(i+1).tag();
+				if ( orderPair.containsKey(tag1) )
+				{
+					Set<String> set = orderPair.get(tag1);
+					if(!set.contains(tag2))
+						ed.addError(" " + tag1 + " " + tag2 + " is not compatible ");
+				}
+			}
+		}
+	}
+
 	private static void checkConjunction(Sentence sentence,ErrorDetails ed)
 	{
 		String label;
@@ -203,8 +257,8 @@ public class WordOrder {
 					{
 						if(!otherTag.equals(tag))
 						{
-//							System.out.println("###############");
-//							System.out.println(sentence + "  **" + otherTag + "**" + tag );
+							//							System.out.println("###############");
+							//							System.out.println(sentence + "  **" + otherTag + "**" + tag );
 							ed.addError("Conjunction should join members of the same type ");
 							break;
 						}

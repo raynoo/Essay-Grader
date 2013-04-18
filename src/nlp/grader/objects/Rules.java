@@ -19,6 +19,8 @@ public class Rules {
 	
 	//blacklisted tags that (should not) appear preceding a gerund
 	private static String[] beforeGerundRules = { "VB", "VBG", "VBD", "VBN", "TO" };
+	private static String[] afterPRPRules = { "VBD", "VBP", "VBZ" }; //vb vbg vbn 
+	//I/she/he/it-VBN is wrong
 //	private static String[] afterGerundRules = { "PRP", "VB", "WP", "VBG", "MD", "NN", "VBD" };
 	
 	public static HashMap<String, Set<String>> getBeforeVerbRules() {

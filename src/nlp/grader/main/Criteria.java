@@ -39,21 +39,25 @@ public class Criteria {
 		
 		String lhs, rhs;
         
-        //check for aux dependency of 2 verbs
-        TypedDependency[] list = sentence.getDependencyTree();
-        for(TypedDependency dep : list) {
-        	if(dep.reln().getShortName().equals("aux")) {
-        		lhs = taggedWords.get(dep.dep().index()-1).tag();
-        		rhs = taggedWords.get(dep.gov().index()-1).tag();
-        		
-        		if((verbVerbRules.get(lhs) != null))
-        			if(!verbVerbRules.get(lhs).contains(rhs)) {
-        				errors1c.addError("Aux. [" + dep.dep() + "-" + dep.gov() + "]");
-        			}
-        	}
-        }
+//        //check for aux dependency of 2 verbs
+//        TypedDependency[] list = sentence.getDependencyTree();
+//        for(TypedDependency dep : list) {
+//        	if(dep.reln().getShortName().equals("aux")) {
+//        		lhs = taggedWords.get(dep.dep().index()-1).tag();
+//        		rhs = taggedWords.get(dep.gov().index()-1).tag();
+//        		
+//        		if((verbVerbRules.get(lhs) != null))
+//        			if(!verbVerbRules.get(lhs).contains(rhs)) {
+//        				errors1c.addError("Aux. [" + dep.dep() + "-" + dep.gov() + "]");
+//        			}
+//        	}
+//        }
 		
-        //keep track of first verb
+		//done TODO: PRP followed by non verb is error.
+		//removed. //done TODO: VBG-NN is wrong
+		//done TODO: shud firstVerb check be only for first word in sentence
+        
+		//keep track of first verb
         TaggedWord firstVerb = null;
         for(int j = 0; j < taggedWords.size(); j++) {
 			if(isVerbTag(taggedWords.get(j).tag())) {
@@ -61,40 +65,64 @@ public class Criteria {
 				break;
 			}
         }
-        //check if first verb is any of the following (incorrect cases).
-        if(firstVerb != null && (firstVerb.tag().equals("VBN") || firstVerb.tag().equals("VBG"))) { //(firstVerb.tag().equals("VB") || 
-        	errors1c.addError("Incorrect Verb order (missing verb). [" + firstVerb + "]");
-        }
-		
-		//traverse through tagged word list and do all checks.
-		for(int j = 1;  taggedWords.size() > 1 && j < taggedWords.size(); j++) {
-			
-			TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j);//, nextVerb = taggedWords.get(j+1);
-			
-			//is there a verb after modal?
-			if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
-				errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
-			}
-			
-			if(isVerbTag(mainVerb.tag())) {
-				
-				//does word before/after a gerund agree?
-				if(mainVerb.tag().equals("VBG")) {
-					if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
-						errors1c.addError("Incorrect (word before) Gerund order. [" + prevVerb + "-" + mainVerb + "]");
-					}
-					if((j+1 < taggedWords.size()) && isVerbTag(taggedWords.get(j+1).tag())) {
-						errors1c.addError("Incorrect (word after) Gerund order. [" + mainVerb + "-" + taggedWords.get(j+1) + "]");
-					}
-				}
-				
-				//does verb verb agree?
-				if(isVerbTag(prevVerb.tag()) && !mainVerb.tag().equals("VBG")) {
-					if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
-						errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
-					}
-				}
-				
+        
+        //1. no verb in sentence
+        if(firstVerb == null)
+        	errors1c.addError("Main Verb missing.");
+        else {
+        	//2. check if first verb is any of the following (incorrect) cases.
+        	if((firstVerb.tag().equals("VBN") || firstVerb.tag().equals("VB"))) { //(firstVerb.tag().equals("VBG") || 
+        		errors1c.addError("Incorrect Verb order (missing verb). [" + firstVerb + "]");
+        	}
+
+        	//first and last words in sentence cannot be vbz
+        	if(taggedWords.get(0).tag().equals("VBZ") || taggedWords.get(taggedWords.size()-1).tag().equals("VBZ")) {
+        		errors1c.addError("Incorrect Verb order (cannot start or end with vbz). [" + 
+        				taggedWords.get(0) + " / " + taggedWords.get(taggedWords.size()-1) + "]");
+        	}
+
+        	//traverse through tagged word list and do all checks.
+        	for(int j = 1;  taggedWords.size() > 1 && j < taggedWords.size(); j++) {
+
+        		TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j);//, nextVerb = taggedWords.get(j+1);
+
+        		//3. is there a verb after modal?
+        		if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
+        			errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
+        		}
+
+        		if(prevVerb.tag().equals("PRP")) {
+        			//4. if there is prp, is it followed by verb?
+        			if(!isVerbTag(mainVerb.tag()) && !mainVerb.tag().equalsIgnoreCase("them") 
+        					&& !mainVerb.tag().equalsIgnoreCase("us") && !mainVerb.tag().equalsIgnoreCase("him")
+        					&& !mainVerb.tag().equalsIgnoreCase("her")) {
+        				errors1c.addError("Missing verb after PRP. [" + prevVerb + "]");
+        			}
+        			//5. if there is prp followed by verb, is it agreeing?
+        			else if(!mainVerb.tag().equals("VBZ") && !isPRPAgreeing(mainVerb, prevVerb))
+        				errors1c.addError("Is this a missing verb with PRP? [" + prevVerb + "-" + mainVerb + "]");
+        		}
+
+        		if(isVerbTag(mainVerb.tag())) {
+
+        			//6, 7. does word before/after a gerund agree?
+        			if(mainVerb.tag().equals("VBG")) {
+        				if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
+        					errors1c.addError("Incorrect Verb order (word before gerund). [" + prevVerb + "-" + mainVerb + "]");
+        				}
+        				//cannot have verb or nn after gerund.
+        				if( (j+1 < taggedWords.size()) && ( isVerbTag(taggedWords.get(j+1).tag())  ) ) { //|| taggedWords.get(j+1).tag().equals("NN")
+        					errors1c.addError("Incorrect Verb order (word after gerund). [" + mainVerb + "-" + taggedWords.get(j+1) + "]");
+        				}
+        			}
+
+        			//8. does verb verb agree?
+        			if(isVerbTag(prevVerb.tag()) && !mainVerb.tag().equals("VBG")) {
+        				if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
+        					errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
+        				}
+        			}
+
 //				//are there 3 verbs in a row?
 //				if(isVerbTag(prevVerb.tag()) && isVerbTag(nextVerb.tag()))
 //					errors1c.addError("Incorrect Verb(s) order (3 verbs tog). [" + prevVerb + "-" + mainVerb + "-" + nextVerb + "]");
@@ -114,10 +142,10 @@ public class Criteria {
 //						errors1c.addError("Incorrect (word after) Verb order. [" + mainVerb + "-" + nextVerb + "]");
 //					}
 //				}
-			
-			}
-		}
-		
+
+        		}
+        	}
+        }
 		//put back all errors
 		sentence.getErrors().put("1c", errors1c);
 		return sentence.getErrors().get("1c");
@@ -257,6 +285,14 @@ public class Criteria {
 			//the pronouns he/she, cannot have a vbp
 			if(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))
 				return false;
+		}
+		if(lhs.tag().equals("VBN") && rhs.tag().equals("PRP")) {
+			if(rhs.word().equalsIgnoreCase("i") || rhs.word().equalsIgnoreCase("he") 
+					|| rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))
+				return false;
+		}
+		if((lhs.tag().equals("VBG") || lhs.tag().equals("VB")) && rhs.tag().equals("PRP")) {
+			return false;
 		}
 		return true;
 	}

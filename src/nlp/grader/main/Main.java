@@ -16,34 +16,52 @@ import nlp.grader.utils.Reader;
  */
 public class Main {
 
-	/**
-	 * Processes the essay and calculates grade.
-	 * @param args
-	 * (@return final grade)
-	 */
+
+	static boolean printErrorDetails = false;
 	public static void main(String[] args) {
 
-		float f= 3.4f;
-		int k = (int) f;
-		System.out.println(k);
-		File corpusPath = new File("test_corpus");
-		Main grader = new Main();
+		if(args.length != 1 && args.length != 2)
+		{
+			System.err.println("You have to specify a file name or folder path containing the" +
+					"documents which are to be test \n Please try again..");
 
-		for(File file : corpusPath.listFiles()) {
-			if(file.isFile()) {
-				System.out.println(file.getName());
-				Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
-				grader.checkEssay(essay);
+			System.err.println("To print just the individual scores  use \t java -jar essay.jar <filename|folder name>");
+			System.err.println("Inorder to print error details please use \t java -jar essay.jar <filename|folder name> <\"details\"> ");
 
-			}
+			System.exit(1);
 		}
 
+		if(args.length == 2)
+		{
+			printErrorDetails = true;
+		}
 
-		//		Sentence s = new Sentence("she came");
-		//		WordOrder.getWordOrderErrors(s);
-		//		
-		//		s.printAllErrors();
+		File corpusPath = new File(args[0]);
+		Main grader = new Main();
 
+		if( !corpusPath.exists() )
+		{
+			System.err.println("File or directory not found " + args[0]);
+			System.exit(1);
+		}
+
+		if(corpusPath.isFile())
+		{
+			System.out.println(corpusPath.getName());
+			Essay essay = new Essay(Reader.readTestingFile(corpusPath.getAbsolutePath()));
+			grader.checkEssay(essay);
+		}
+		else
+		{
+			for(File file : corpusPath.listFiles()) {
+				if(file.isFile()) {
+					System.out.println(file.getName());
+					Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
+					grader.checkEssay(essay);
+
+				}
+			}
+		}
 	}
 
 
@@ -60,24 +78,30 @@ public class Main {
 
 		for(Sentence s : essay.getSentences()) {
 
-			//System.out.println("\n" + s + "\t" + s.getTaggedWords());
-
-			//all criteria checks
-//			WordOrder.getWordOrderErrors(s);
-//			Criteria.isVerbNounAgreeing(s);
-//			b1+=s.getErrors().get("1b").getErrorCount();
-//			a1+=s.getErrors().get("1a").getErrorCount();
+			WordOrder.getWordOrderErrors(s);
+			Criteria.isVerbNounAgreeing(s);
 			Criteria.isVerbAgreeing(s);
-			s.printAllErrors();
+
+			b1+=s.getErrors().get("1b").getErrorCount();
+			a1+=s.getErrors().get("1a").getErrorCount();
 			c1+=s.getErrors().get("1c").getErrorCount();
 
+			if(printErrorDetails)
+				s.printAllErrors();
 
 		}
 
-//		System.out.println("Number of sentences = " + n + " 1a error = " + a1 + " 1b error " + b1);
-//		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
-//		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
-//		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
+		System.out.println("Number of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+		System.out.println("Scores are ");
+		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
+		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
+		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
+		
+		if(n >= 5)
+			System.out.println("3a = 5");
+		else
+			System.out.println("3a = " + n);
+		
 		System.out.println("\n--------------------------------------------\n");
 	}
 

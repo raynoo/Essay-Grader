@@ -15,6 +15,7 @@ import nlp.grader.objects.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TypedDependency;
 
 /**
  * 
@@ -48,7 +49,6 @@ public class WordOrder {
 				}
 
 				toAdd.add(tag2);
-
 			}
 		}
 		catch(Exception e)
@@ -68,14 +68,112 @@ public class WordOrder {
 			sentence.getErrors().put("1a", ed);
 		}		
 
-		//		basicCheck(sentence,ed);
-		//		twoPronoun(sentence,ed);
-		//		checkConjunction(sentence,ed);
-		//		checkTo(sentence, ed);
-		checkWordOrderRules(sentence, ed);
+				basicCheck(sentence,ed);
+				twoPronoun(sentence,ed);
+				checkConjunction(sentence,ed);
+				checkTo(sentence, ed);
+				checkwordOrder(sentence, ed);
+		//		checkWordOrderRules(sentence, ed);
+		
 
 
 		//System.out.println(ed.toString());
+	}
+
+	/** check word order*/
+
+	private static void checkwordOrder(Sentence sentence , ErrorDetails ed)
+	{		
+		
+		TypedDependency[] depArray = sentence.getDependencyTree();
+		// dep 
+		// gov
+
+		int subjPos = -1;
+		int verbPos = -1;
+		int objPos = -1;
+
+		for(TypedDependency dep : depArray)
+		{
+			if( dep.reln().toString().equals("nsubj") )
+			{ 				
+				subjPos = dep.dep().index();
+				verbPos = dep.gov().index();
+
+				if( !sentence.getTaggedWords().get(verbPos-1).tag().contains("VB") )
+				{
+					verbPos = -1;
+				}				
+				break;				
+			}			
+		}
+
+		if(verbPos < 0)
+		{
+			for(TypedDependency dep : depArray)
+			{
+				if( dep.reln().toString().contains("cop") )
+				{
+					objPos = dep.gov().index();
+					verbPos = dep.dep().index();
+					break;
+				}
+			}
+		}
+		else
+		{
+			for(TypedDependency dep : depArray)
+			{
+				if( dep.reln().toString().contains("iobj") || dep.reln().toString().contains("dobj") )
+				{
+					objPos = dep.dep().index();
+					break;
+				}
+			}
+
+			if(objPos < 0)
+			{
+				for(TypedDependency dep : depArray)
+				{
+					if( dep.reln().toString().contains("pobj"))
+					{
+						objPos = dep.dep().index();
+						break;
+					}
+				}
+			}
+		}
+
+
+		if(subjPos < 0)
+		{
+			for(TypedDependency dep : depArray)
+			{
+				if( dep.reln().toString().contains("nsubjpass"))
+				{
+					subjPos = dep.dep().index();
+				}
+				else if( dep.reln().toString().contains("auxpass"))
+				{
+					verbPos = dep.dep().index();
+				}
+			}
+
+		}
+
+		if(subjPos < 0)
+			ed.addError("Subject not found ");
+		else if(verbPos < 0)
+			ed.addError("Verb not found");
+		else
+		{
+			if(objPos < 0)
+				objPos = sentence.getTaggedWords().size()+1;
+
+			if( !(objPos > verbPos) || !(verbPos > subjPos) )
+				ed.addError("SVO mismmatch");			
+		}	
+
 	}
 
 	//******************************8
@@ -96,21 +194,18 @@ public class WordOrder {
 			}
 		}
 
-		if( label.equals("PP") )
-		{
-			// sadly this can be correct
-		}
-		else if(label.equals("ADVP"))
+
+		 if(label.equals("ADVP"))
 		{
 			if(!sentence.toString().contains(","))
 			{
 				ed.addError("after ADVP there is no comma");
 			}
 		}
-		else if (!label.equals("NP"))
-		{
-			ed.addError("The starting tag is not correct");
-		}
+//		else if (!label.equals("NP"))
+//		{
+//			ed.addError("The starting tag is not correct");
+//		}
 	}
 
 

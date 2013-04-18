@@ -20,6 +20,7 @@ public class Essay {
 		this.essay = new ArrayList<Sentence>();
 		for(String s : sentences)
 		{
+			try{
 			String lastSentence = "";
 			
 			s = s.replaceAll("\\s+,", ",");
@@ -80,6 +81,12 @@ public class Essay {
 
 			if( s.indexOf(lastSentence) + lastSentence.length() +1 < s.length())
 				this.essay.add(new Sentence( s.substring( s.indexOf(lastSentence) + lastSentence.length() +1 ) ));
+		}
+			catch(Exception e)
+			{
+				System.out.println("not able to fragment the sentence " + s);
+				this.essay.add(new Sentence(s));
+			}
 		}
 
 		this.essayPoints = new Points();

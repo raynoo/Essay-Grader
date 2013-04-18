@@ -22,7 +22,7 @@ public class SParser {
 		//System.out.println(parseTree.taggedYield());
 		
 		GrammaticalStructureFactory gsf = new PennTreebankLanguagePack().grammaticalStructureFactory();
-		Collection<TypedDependency> td = gsf.newGrammaticalStructure(this.parseTree).typedDependenciesCollapsed();
+		Collection<TypedDependency> td = gsf.newGrammaticalStructure(this.parseTree).allTypedDependencies();
 		this.dependencyTree = td.toArray(new TypedDependency[0]);
 	}
 	

@@ -95,7 +95,7 @@ public class Criteria {
         			//4. if there is prp, is it followed by verb?
         			if(!isVerbTag(mainVerb.tag()) && !mainVerb.tag().equalsIgnoreCase("them") 
         					&& !mainVerb.tag().equalsIgnoreCase("us") && !mainVerb.tag().equalsIgnoreCase("him")
-        					&& !mainVerb.tag().equalsIgnoreCase("her")) {
+        					&& !mainVerb.tag().equalsIgnoreCase("her") && !mainVerb.tag().equalsIgnoreCase(".")) {
         				errors1c.addError("Missing verb after PRP. [" + prevVerb + "]");
         			}
         			//5. if there is prp followed by verb, is it agreeing?

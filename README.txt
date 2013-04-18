@@ -7,45 +7,58 @@ Name2 kvarke2(at)uic.edu
 -------------------------------------------------------------------------
 --->SETUP<---------------------------------------------------------------
 
-Here you should describe how to run your program. Imagine someone (me)
-downloads your archive file on a computer and needs step by step
-instructions to make everything work. Make sure to specify the relative
-positions of files and folders, if needed.
+Software needed : Jre 6 or above
 
+Download the jar to your computer.
+
+To execute 
+
+java -jar essay.jar <filename|folder name>
 
 -------------------------------------------------------------------------
 --->INPUT<---------------------------------------------------------------
 	
-Use this section only if your program requires some arguments as input.
 
+java -jar essay.jar <filename|folder name>
+
+filename = location of the file on which you want to run the test
+folder name = location of the folder which has the files for which you want to run the test
 
 -------------------------------------------------------------------------
 --->OUTPUT<--------------------------------------------------------------
 
-In this section you must specify what your program writes in the
-standard or file output. 
+If you use  java -jar essay.jar <filename|folder name> to run the program and if the inputs
+are correct, you will get the following message on your system out.
+
+<filename>
+Number of sentences = x, number of 1a error = x, number of 1b error = x, number of 1c error = x
+Scores are 
+1a = [1-5]
+1b = [1-5]
+1c = [1-5]
+3a = [1-5]
 	
 
 -------------------------------------------------------------------------
 --->FILES<---------------------------------------------------------------
 
-This sections must include a description of any file your program reads
-or writes. Include a description of where the file is located, how it
-is formatted, and what its purpose is. Do not describe the files already
-provided to you, such as the essays. Just describe the files you create,
-if any.
+java -jar essay.jar <filename|folder name>
+
+filename = location of the file on which you want to run the test
+folder name = location of the folder which has the files for which you want to run the test
+
+The application gives out the output on system out.
 	
 
 -------------------------------------------------------------------------
 --->TECHNIQUE<-----------------------------------------------------------
 
-A brief explanation of how you exploited POS tagging to evaluate the essays.
-Also state some patterns of errors in terms of POS tags that you found.
+
 
 
 -------------------------------------------------------------------------
 --->TODO<----------------------------------------------------------------
 	
-Write here a short list of what you plan to do/fix for the second part of
-the project.
+We have not yet decided on hot to approach the semantic part of the project. As far as the 
+syntactic part is concerned we believe we have covered almost all the possible combinations. 
 

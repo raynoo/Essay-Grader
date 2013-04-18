@@ -2,7 +2,6 @@ package nlp.grader.main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -36,19 +35,70 @@ public class Criteria {
 			errors1c = new ErrorDetails("1c");
 		
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
-
-		//traverse through tagged word list and do all checks.
-		for(int j = 1;  taggedWords.size() > 1 && j+1 < taggedWords.size(); j++) {
-			
-			TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j), nextVerb = taggedWords.get(j+1);
-
+		HashMap<String, Set<String>> verbVerbRules = Rules.getVerbVerbRules();
+		
+		String lhs, rhs;
+        
+        //check for aux dependency of 2 verbs
+        TypedDependency[] list = sentence.getDependencyTree();
+        for(TypedDependency dep : list) {
+        	if(dep.reln().getShortName().equals("aux")) {
+        		lhs = taggedWords.get(dep.dep().index()-1).tag();
+        		rhs = taggedWords.get(dep.gov().index()-1).tag();
+        		
+        		if((verbVerbRules.get(lhs) != null))
+        			if(!verbVerbRules.get(lhs).contains(rhs)) {
+        				errors1c.addError("Aux. [" + dep.dep() + "-" + dep.gov() + "]");
+        			}
+        	}
+        }
+		
+        //keep track of first verb
+        TaggedWord firstVerb = null;
+        for(int j = 0; j < taggedWords.size(); j++) {
 			if(isVerbTag(taggedWords.get(j).tag())) {
+				firstVerb = taggedWords.get(j);
+				break;
+			}
+        }
+        //check if first verb is any of the following (incorrect cases).
+        if(firstVerb != null && (firstVerb.tag().equals("VBN") || firstVerb.tag().equals("VBG"))) { //(firstVerb.tag().equals("VB") || 
+        	errors1c.addError("Incorrect Verb order (missing verb). [" + firstVerb + "]");
+        }
+		
+		//traverse through tagged word list and do all checks.
+		for(int j = 1;  taggedWords.size() > 1 && j < taggedWords.size(); j++) {
+			
+			TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j);//, nextVerb = taggedWords.get(j+1);
+			
+			//is there a verb after modal?
+			if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
+				errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
+			}
+			
+			if(isVerbTag(mainVerb.tag())) {
 				
-				//is there a verb after modal?
-				if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
-					errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
+				//does word before/after a gerund agree?
+				if(mainVerb.tag().equals("VBG")) {
+					if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
+						errors1c.addError("Incorrect (word before) Gerund order. [" + prevVerb + "-" + mainVerb + "]");
+					}
+					if((j+1 < taggedWords.size()) && isVerbTag(taggedWords.get(j+1).tag())) {
+						errors1c.addError("Incorrect (word after) Gerund order. [" + mainVerb + "-" + taggedWords.get(j+1) + "]");
+					}
 				}
 				
+				//does verb verb agree?
+				if(isVerbTag(prevVerb.tag()) && !mainVerb.tag().equals("VBG")) {
+					if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
+						errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
+					}
+				}
+				
+//				//are there 3 verbs in a row?
+//				if(isVerbTag(prevVerb.tag()) && isVerbTag(nextVerb.tag()))
+//					errors1c.addError("Incorrect Verb(s) order (3 verbs tog). [" + prevVerb + "-" + mainVerb + "-" + nextVerb + "]");
+//				
 //				HashMap<String, Set<String>> beforeVerbRules = Rules.getBeforeVerbRules();
 //				//does prev and main agree?
 //				if(beforeVerbRules.containsKey(mainVerb.tag()) && !mainVerb.tag().equals("VBG") && !prevVerb.tag().equals("MD")) {
@@ -64,64 +114,14 @@ public class Criteria {
 //						errors1c.addError("Incorrect (word after) Verb order. [" + mainVerb + "-" + nextVerb + "]");
 //					}
 //				}
-				
-				//does word before/after a gerund agree?
-				if(mainVerb.tag().equals("VBG")) {
-					if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
-						errors1c.addError("Incorrect (word before) Gerund order. [" + prevVerb + "-" + mainVerb + "]");
-					}
-					if(isVerbTag(nextVerb.tag())) {
-						errors1c.addError("Incorrect (word after) Gerund order. [" + mainVerb + "-" + nextVerb + "]");
-					}
-				}
-				
-				HashMap<String, Set<String>> verbVerbRules = Rules.getVerbVerbRules();
-				//does verb verb agree?
-				if(isVerbTag(prevVerb.tag()) && isVerbTag(mainVerb.tag()) && !mainVerb.tag().equals("VBG")) {
-					if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
-						errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
-					}
-				}
-				if(isVerbTag(mainVerb.tag()) && isVerbTag(nextVerb.tag()) && !nextVerb.tag().equals("VBG")) {
-					if(!verbVerbRules.get(mainVerb.tag()).contains(nextVerb.tag())) {
-						errors1c.addError("Incorrect Verb(s) order. [" + mainVerb + "-" + nextVerb + "]");
-					}
-				}
-				
-				//are there 3 verbs in a row?
-				if(isVerbTag(prevVerb.tag()) && isVerbTag(mainVerb.tag()) && isVerbTag(nextVerb.tag()))
-					errors1c.addError("Incorrect Verb(s) order (3 verbs tog). [" + prevVerb + "-" + mainVerb + "-" + nextVerb + "]");
-				
+			
 			}
 		}
-		
 		
 		//put back all errors
 		sentence.getErrors().put("1c", errors1c);
 		return sentence.getErrors().get("1c");
 	}
-	
-	/**
-	 * Check if 2 verb tags agree as per verb-verb agreement rules 
-	 * (lhs shud occur before rhs in the actual sentence)
-	 * 
-	 * @param lhs
-	 * @param rhs
-	 * @return agreement
-	 */
-//	public static boolean isVerbVerbAgreeing(String lhs, String rhs) {
-//		List<Rule> verbVerbRules = Rules.getVerbVerbRules();
-//		
-//		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
-//		if(isVerbTag(lhs) && isVerbTag(rhs)) {
-//			for(Rule r : verbVerbRules) {
-//				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
-//					return true;
-//			}
-//			return false;
-//		}
-//		return true;
-//	}
 	
 	/**
 	 * Criteria 1b
@@ -215,6 +215,7 @@ public class Criteria {
 				}
 			}
 		}
+		
 		//parse through sentence to get consecutive noun-verb pairs
 		for(int i = 0; i < taggedWords.size(); i++) {
 			if(isNounTag(taggedWords.get(i).tag()) 

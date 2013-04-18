@@ -55,7 +55,8 @@ public class Sentence {
 	{
 		for(String key :  parseErrors.keySet())
 		{
-			System.out.println(parseErrors.get(key).toString());
+			if(parseErrors.get(key).getErrorCount() > 0)
+				System.out.println(parseErrors.get(key).toString());
 		}
 	}
 	

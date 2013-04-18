@@ -1,0 +1,12 @@
+#bigram rules
+#tags following verbs
+MD RB
+MD VB
+VB DT
+VB NN
+VB PRP$
+VBD DT
+#VBG DT
+#VBG PRP$
+VBZ DT
+VBZ WDT

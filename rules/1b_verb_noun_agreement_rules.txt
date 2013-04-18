@@ -10,14 +10,13 @@
 #VBP	verb, sing. present, non-3d	 			take
 #VBZ	verb, 3rd person sing. present	 		takes
 
+#verb-noun combination rules
 VBP NNS
 VBP NNPS
 VBP PRP
-#VBZ NNS
 VBZ NNPS
 VBZ NNP
 VBZ NN
-#TODO: but rule out PRP being i they you
 VBZ PRP
 VBN NN
 VBN NNP
@@ -26,7 +25,6 @@ VBD NN
 VBD NNS
 VBD NNP
 VBD PRP
-#TODO: English/NNP, to/TO, help/VB here vb-nnp is correct but checker gets it wrong. so it shud be correct only if vb is preceded by to/det
 VB NNS
 VB NNS
 VB PRP

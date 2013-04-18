@@ -1,8 +1,10 @@
 package nlp.grader.main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import nlp.grader.objects.ErrorDetails;
 import nlp.grader.objects.Rule;
@@ -34,56 +36,65 @@ public class Criteria {
 			errors1c = new ErrorDetails("1c");
 		
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
-		int i = 0;
-		
-		//check for verb-gerund sequence
-		for(Iterator<TaggedWord> iter = taggedWords.iterator(); iter.hasNext(); i++) {
-			TaggedWord word = iter.next();
-			TaggedWord prev = null;
+
+		//traverse through tagged word list and do all checks.
+		for(int j = 1;  taggedWords.size() > 1 && j+1 < taggedWords.size(); j++) {
 			
-			//if gerund is present, check if preceding tag is among blacklisted tags
-			if(word.tag().equals("VBG")) {
-				if(i-1 >= 0) {
-					prev = taggedWords.get(i-1);
-					
-					if(Rules.getVGerundErrorRules().contains(prev.tag())) {
-						errors1c.addError("Verb-Gerund do not agree. [" + prev + "-" + word + "]");
+			TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j), nextVerb = taggedWords.get(j+1);
+
+			if(isVerbTag(taggedWords.get(j).tag())) {
+				
+				//is there a verb after modal?
+				if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
+					errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
+				}
+				
+//				HashMap<String, Set<String>> beforeVerbRules = Rules.getBeforeVerbRules();
+//				//does prev and main agree?
+//				if(beforeVerbRules.containsKey(mainVerb.tag()) && !mainVerb.tag().equals("VBG") && !prevVerb.tag().equals("MD")) {
+//					if(!isVerbTag(prevVerb.tag()) && !beforeVerbRules.get(mainVerb.tag()).contains(prevVerb.tag())) {
+//						errors1c.addError("Incorrect (word before) Verb order. [" + prevVerb + "-" + mainVerb + "]");
+//					}
+//				}
+//				
+//				HashMap<String, Set<String>> afterVerbRules = Rules.getAfterVerbRules();
+//				//does main and next agree?
+//				if(afterVerbRules.containsKey(mainVerb.tag()) && !mainVerb.tag().equals("VBG") && !mainVerb.tag().equals("MD")) {
+//					if(!isVerbTag(nextVerb.tag()) && !afterVerbRules.get(mainVerb.tag()).contains(nextVerb.tag())) {
+//						errors1c.addError("Incorrect (word after) Verb order. [" + mainVerb + "-" + nextVerb + "]");
+//					}
+//				}
+				
+				//does word before/after a gerund agree?
+				if(mainVerb.tag().equals("VBG")) {
+					if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
+						errors1c.addError("Incorrect (word before) Gerund order. [" + prevVerb + "-" + mainVerb + "]");
+					}
+					if(isVerbTag(nextVerb.tag())) {
+						errors1c.addError("Incorrect (word after) Gerund order. [" + mainVerb + "-" + nextVerb + "]");
 					}
 				}
-			}
-		}
-		
-		String lhs, rhs;
-		
-		//check for aux dependency of 2 verbs
-		TypedDependency[] list = sentence.getDependencyTree();
-		for(TypedDependency dep : list) {
-			if(dep.reln().getShortName().equals("aux")) {
-				lhs = taggedWords.get(dep.dep().index()-1).tag();
-				rhs = taggedWords.get(dep.gov().index()-1).tag();
 				
-				if(!isVerbVerbAgreeing(lhs, rhs)) {
-					errors1c.addError("Verb-Verb do not agree. [" + dep.dep() + lhs + "-" + dep.gov() + rhs + "]");
+				HashMap<String, Set<String>> verbVerbRules = Rules.getVerbVerbRules();
+				//does verb verb agree?
+				if(isVerbTag(prevVerb.tag()) && isVerbTag(mainVerb.tag()) && !mainVerb.tag().equals("VBG")) {
+					if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
+						errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
+					}
 				}
+				if(isVerbTag(mainVerb.tag()) && isVerbTag(nextVerb.tag()) && !nextVerb.tag().equals("VBG")) {
+					if(!verbVerbRules.get(mainVerb.tag()).contains(nextVerb.tag())) {
+						errors1c.addError("Incorrect Verb(s) order. [" + mainVerb + "-" + nextVerb + "]");
+					}
+				}
+				
+				//are there 3 verbs in a row?
+				if(isVerbTag(prevVerb.tag()) && isVerbTag(mainVerb.tag()) && isVerbTag(nextVerb.tag()))
+					errors1c.addError("Incorrect Verb(s) order (3 verbs tog). [" + prevVerb + "-" + mainVerb + "-" + nextVerb + "]");
+				
 			}
 		}
 		
-		//parse through sentence to get consecutive verb-verb pairs that are not covered in aux's
-		for(int j = 0; j < taggedWords.size() && j+1 < taggedWords.size(); j++) {
-			TaggedWord firstVerb = taggedWords.get(j), secondVerb = taggedWords.get(j+1);
-			
-			if(firstVerb.tag().equals("MD") && !isVerbTag(secondVerb.tag())) {
-				//if MD is encountered, then next word should be a verbtag
-				errors1c.addError("Missing Verb. A verb should follow a modal. [" + firstVerb + "]");
-			}
-			
-			//any other verb-verb combinations?
-			if(isVerbTag(firstVerb.tag()) && isVerbTag(secondVerb.tag())) {
-				if(!isVerbVerbAgreeing(secondVerb.tag(), firstVerb.tag())) {
-					errors1c.addError("Other: Verb-Verb do not agree. [" + firstVerb + "-" + secondVerb + "]");
-				}
-			}
-		}
 		
 		//put back all errors
 		sentence.getErrors().put("1c", errors1c);
@@ -91,24 +102,26 @@ public class Criteria {
 	}
 	
 	/**
-	 * Check if 2 tags (lhs = verb rhs = verb) agree as per verb-verb agreement rules
+	 * Check if 2 verb tags agree as per verb-verb agreement rules 
+	 * (lhs shud occur before rhs in the actual sentence)
+	 * 
 	 * @param lhs
 	 * @param rhs
 	 * @return agreement
 	 */
-	public static boolean isVerbVerbAgreeing(String lhs, String rhs) {
-		List<Rule> verbVerbRules = Rules.getVerbVerbRules();
-		
-		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
-		if(isVerbTag(lhs)) {
-			for(Rule r : verbVerbRules) {
-				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
-					return true;
-			}
-			return false;
-		}
-		return true;
-	}
+//	public static boolean isVerbVerbAgreeing(String lhs, String rhs) {
+//		List<Rule> verbVerbRules = Rules.getVerbVerbRules();
+//		
+//		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
+//		if(isVerbTag(lhs) && isVerbTag(rhs)) {
+//			for(Rule r : verbVerbRules) {
+//				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
+//					return true;
+//			}
+//			return false;
+//		}
+//		return true;
+//	}
 	
 	/**
 	 * Criteria 1b
@@ -120,17 +133,17 @@ public class Criteria {
 		List<TypedDependency> nsubjs = new ArrayList<TypedDependency>();
 		List<TypedDependency> auxs = new ArrayList<TypedDependency>();
 		List<TypedDependency> conj = new ArrayList<TypedDependency>();
-		
+
 		ErrorDetails errors1b;
-		
+
 		if(sentence.getErrors().containsKey("1b"))
 			errors1b = sentence.getErrors().get("1b");
 		else
 			errors1b = new ErrorDetails("1b");
-		
+
 		//get the dependency tree (in list form)
 		TypedDependency[] list = sentence.getDependencyTree();
-		
+
 		//collect all nsubj, cop, nsubjpass dependencies
 		for(TypedDependency dep : list) {
 			if(dep.reln().getShortName().equals("nsubj")) {
@@ -147,20 +160,20 @@ public class Criteria {
 				conj.add(dep);
 			}
 		}
-		
+
 		//if none are present, grammar is wrong
 		if(nsubjs.isEmpty()) {
 			errors1b.addError("No Subject-Verb relation present.");
 			sentence.getErrors().put("1b", errors1b);
 			return sentence.getErrors().get("1b");
 		}
-		
+
 		//list of words and its tags. to get the tag of a given word.
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
 		//lhs = TypedDependency's governor word = verb
 		//rhs = TypedDependency's dependency word = noun
 		String lhs, rhs;
-		
+
 		//handle nsubj with cop, aux, auxpass
 		if(!auxs.isEmpty()) {
 			for(TypedDependency depnsubj : nsubjs) {
@@ -169,7 +182,7 @@ public class Criteria {
 
 						lhs = taggedWords.get(depaux.dep().index()-1).tag();
 						rhs = taggedWords.get(depnsubj.dep().index()-1).tag();
-						
+
 						if(!isVerbNounAgreeing(lhs, rhs)) {
 							//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 							if(!isConjPresent(lhs, rhs, depnsubj, conj))
@@ -206,10 +219,10 @@ public class Criteria {
 		for(int i = 0; i < taggedWords.size(); i++) {
 			if(isNounTag(taggedWords.get(i).tag()) 
 					&& i != taggedWords.size()-1 && isVerbTag(taggedWords.get(i+1).tag())) {
-				
+
 				TaggedWord noun = taggedWords.get(i), verb = taggedWords.get(i+1);
 				boolean alreadyProcessed = false;
-				
+
 				//has this noun been processed earlier, as part of nsubj?
 				for(TypedDependency td : nsubjs) {
 					if(td.dep().value().equals(noun.value()))
@@ -221,11 +234,10 @@ public class Criteria {
 				}
 			}
 		}
-		
+
 		//put back all errors
 		sentence.getErrors().put("1b", errors1b);
-		return sentence.getErrors().get("1b");
-	}
+		return sentence.getErrors().get("1b");}
 	
 	/**
 	 * Check verb agreement for personal pronouns 
@@ -235,8 +247,14 @@ public class Criteria {
 	 */
 	private static boolean isPRPAgreeing(TaggedWord lhs, TaggedWord rhs) {
 		if(lhs.tag().equals("VBZ") && rhs.tag().equals("PRP")) {
-			//if not he/she, the verb cannot be vbz
-			if(!(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she")))
+			//the pronouns they/we/i/you cannot have a vbz
+			if(rhs.word().equalsIgnoreCase("they") || rhs.word().equalsIgnoreCase("we") 
+					|| rhs.word().equalsIgnoreCase("i")  || rhs.word().equalsIgnoreCase("you"))
+				return false;
+		}
+		if(lhs.tag().equals("VBP") && rhs.tag().equals("PRP")) {
+			//the pronouns he/she, cannot have a vbp
+			if(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))
 				return false;
 		}
 		return true;
@@ -255,13 +273,13 @@ public class Criteria {
 		if((rhs.equals("NN") || rhs.equals("NNP") 
 				|| dep.dep().nodeString().equalsIgnoreCase("i") || dep.dep().nodeString().equalsIgnoreCase("me") 
 				|| dep.dep().nodeString().equalsIgnoreCase("he") || dep.dep().nodeString().equalsIgnoreCase("she"))
-			&& (lhs.equals("VBP") || lhs.equals("VBG"))) {
+				&& (lhs.equals("VBP") || lhs.equals("VBG"))) {
 
 			if(!conj.isEmpty()) {
 				for(TypedDependency d : conj) {
 					if(d.dep().nodeString().equals(dep.dep().nodeString()) ||
 							d.gov().nodeString().equals(dep.dep().nodeString()))
-						
+
 						return true;
 				}
 			}
@@ -277,7 +295,7 @@ public class Criteria {
 	 */
 	private static boolean isVerbNounAgreeing(String lhs, String rhs) {
 		List<Rule> verbNounRules = Rules.getVerbNounRules();
-		
+
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
 		if(isVerbTag(lhs)) {
 			for(Rule r : verbNounRules) {
@@ -287,7 +305,7 @@ public class Criteria {
 			return false;
 		}
 		return true;
-	}
+}
 	
 	/**
 	 * Is a tag that of a verb?

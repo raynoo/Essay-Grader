@@ -23,6 +23,9 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 
+		float f= 3.4f;
+		int k = (int) f;
+		System.out.println(k);
 		File corpusPath = new File("test_corpus");
 		Main grader = new Main();
 
@@ -30,7 +33,6 @@ public class Main {
 			if(file.isFile()) {
 				System.out.println(file.getName());
 				Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
-				//				System.out.println(essay.getSentences());
 				grader.checkEssay(essay);
 
 			}
@@ -53,6 +55,7 @@ public class Main {
 	public void checkEssay(Essay essay) {
 		float a1 = 0;
 		float b1 = 0;
+		float c1 = 0;
 		float n = essay.getSentences().size();
 
 		for(Sentence s : essay.getSentences()) {
@@ -60,18 +63,21 @@ public class Main {
 			//System.out.println("\n" + s + "\t" + s.getTaggedWords());
 
 			//all criteria checks
-			WordOrder.getWordOrderErrors(s);
-			Criteria.isVerbNounAgreeing(s);
-			b1+=s.getErrors().get("1b").getErrorCount();
-			a1+=s.getErrors().get("1a").getErrorCount();
-			//Criteria.isVerbAgreeing(s);
+//			WordOrder.getWordOrderErrors(s);
+//			Criteria.isVerbNounAgreeing(s);
+//			b1+=s.getErrors().get("1b").getErrorCount();
+//			a1+=s.getErrors().get("1a").getErrorCount();
+			Criteria.isVerbAgreeing(s);
+			s.printAllErrors();
+			c1+=s.getErrors().get("1c").getErrorCount();
 
 
 		}
 
-		System.out.println("Number of sentences = " + n + " 1a error = " + a1 + " 1b error " + b1);
-		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
-		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
+//		System.out.println("Number of sentences = " + n + " 1a error = " + a1 + " 1b error " + b1);
+//		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
+//		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
+//		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
 		System.out.println("\n--------------------------------------------\n");
 	}
 

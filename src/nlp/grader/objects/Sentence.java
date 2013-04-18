@@ -54,7 +54,9 @@ public class Sentence {
 	public void printAllErrors()
 	{
 		boolean status = false;
+		System.out.println(this.toString());
 		System.out.println(getTaggedWords());
+		
 	
 		for(String key :  parseErrors.keySet())
 		{
@@ -62,8 +64,10 @@ public class Sentence {
 			{
 				status = true;
 				System.out.println(parseErrors.get(key).toString());
+				System.out.println("***********************");
 			}
 		}
+
 	}
 		
 

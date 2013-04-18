@@ -18,7 +18,7 @@ public class Rules {
 	private static HashMap<String, Set<String>> afterVerbRules = null;
 	
 	//blacklisted tags that (should not) appear preceding a gerund
-	private static String[] beforeGerundRules = { "VB", "VBG", "MD", "VBD" };
+	private static String[] beforeGerundRules = { "VB", "VBG", "VBD", "VBN", "TO" };
 //	private static String[] afterGerundRules = { "PRP", "VB", "WP", "VBG", "MD", "NN", "VBD" };
 	
 	public static HashMap<String, Set<String>> getBeforeVerbRules() {

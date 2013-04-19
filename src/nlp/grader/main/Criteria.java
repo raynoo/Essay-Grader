@@ -37,26 +37,6 @@ public class Criteria {
 		List<TaggedWord> taggedWords = sentence.getTaggedWords();
 		HashMap<String, Set<String>> verbVerbRules = Rules.getVerbVerbRules();
 		
-		String lhs, rhs;
-        
-//        //check for aux dependency of 2 verbs
-//        TypedDependency[] list = sentence.getDependencyTree();
-//        for(TypedDependency dep : list) {
-//        	if(dep.reln().getShortName().equals("aux")) {
-//        		lhs = taggedWords.get(dep.dep().index()-1).tag();
-//        		rhs = taggedWords.get(dep.gov().index()-1).tag();
-//        		
-//        		if((verbVerbRules.get(lhs) != null))
-//        			if(!verbVerbRules.get(lhs).contains(rhs)) {
-//        				errors1c.addError("Aux. [" + dep.dep() + "-" + dep.gov() + "]");
-//        			}
-//        	}
-//        }
-		
-		//done TODO: PRP followed by non verb is error.
-		//removed. //done TODO: VBG-NN is wrong
-		//done TODO: shud firstVerb check be only for first word in sentence
-        
 		//keep track of first verb
         TaggedWord firstVerb = null;
         for(int j = 0; j < taggedWords.size(); j++) {
@@ -71,11 +51,11 @@ public class Criteria {
         	errors1c.addError("Main Verb missing.");
         else {
         	//2. check if first verb is any of the following (incorrect) cases.
-        	if((firstVerb.tag().equals("VBN") || firstVerb.tag().equals("VB"))) { //(firstVerb.tag().equals("VBG") || 
+        	if((firstVerb.tag().equals("VBN"))) { //(firstVerb.tag().equals("VBG") || || firstVerb.tag().equals("VB") 
         		errors1c.addError("Incorrect Verb order (missing verb). [" + firstVerb + "]");
         	}
 
-        	//first and last words in sentence cannot be vbz
+        	//3. first and last words in sentence cannot be vbz
         	if(taggedWords.get(0).tag().equals("VBZ") || taggedWords.get(taggedWords.size()-1).tag().equals("VBZ")) {
         		errors1c.addError("Incorrect Verb order (cannot start or end with vbz). [" + 
         				taggedWords.get(0) + " / " + taggedWords.get(taggedWords.size()-1) + "]");
@@ -86,31 +66,31 @@ public class Criteria {
 
         		TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j);//, nextVerb = taggedWords.get(j+1);
 
-        		//3. is there a verb after modal?
+        		//4. is there a verb after modal?
         		if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
         			errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
         		}
 
         		if(prevVerb.tag().equals("PRP")) {
-        			//4. if there is prp, is it followed by verb?
+        			//5. if there is prp, is it followed by verb?
         			if(!isVerbTag(mainVerb.tag()) && !mainVerb.tag().equalsIgnoreCase("them") 
         					&& !mainVerb.tag().equalsIgnoreCase("us") && !mainVerb.tag().equalsIgnoreCase("him")
         					&& !mainVerb.tag().equalsIgnoreCase("her") && !mainVerb.tag().equalsIgnoreCase(".")) {
         				errors1c.addError("Missing verb after PRP. [" + prevVerb + "]");
         			}
-        			//5. if there is prp followed by verb, is it agreeing?
-        			else if(!mainVerb.tag().equals("VBZ") && !isPRPAgreeing(mainVerb, prevVerb))
-        				errors1c.addError("Is this a missing verb with PRP? [" + prevVerb + "-" + mainVerb + "]");
+        			//6. if there is prp followed by verb, is it agreeing?
+        			else if(!isVerbPRPAgreeing(mainVerb, prevVerb))
+        				errors1c.addError("Missing verb after PRP. [" + prevVerb + "-" + mainVerb + "]");
         		}
 
         		if(isVerbTag(mainVerb.tag())) {
 
-        			//6, 7. does word before/after a gerund agree?
+        			//7, 8. does word before/after a gerund agree?
         			if(mainVerb.tag().equals("VBG")) {
         				if(Rules.getBeforeGerundErrorRules().contains(prevVerb.tag())) {
         					errors1c.addError("Incorrect Verb order (word before gerund). [" + prevVerb + "-" + mainVerb + "]");
         				}
-        				//cannot have verb or nn after gerund.
+        				//cannot have verb after gerund.
         				if( (j+1 < taggedWords.size()) && ( isVerbTag(taggedWords.get(j+1).tag())  ) ) { //|| taggedWords.get(j+1).tag().equals("NN")
         					errors1c.addError("Incorrect Verb order (word after gerund). [" + mainVerb + "-" + taggedWords.get(j+1) + "]");
         				}
@@ -149,6 +129,25 @@ public class Criteria {
 		//put back all errors
 		sentence.getErrors().put("1c", errors1c);
 		return sentence.getErrors().get("1c");
+	}
+	
+	//(for verb verb agreement)
+	private static boolean isVerbPRPAgreeing(TaggedWord lhs, TaggedWord rhs) {
+		//the pronouns he/she, cannot have a vbp
+		if(lhs.tag().equals("VBP") &&
+				(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she") 
+				|| rhs.word().equalsIgnoreCase("it"))) {
+				return false;
+		}
+		if(lhs.tag().equals("VBN") && 
+				(rhs.word().equalsIgnoreCase("i") || rhs.word().equalsIgnoreCase("he") 
+				|| rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))) {
+				return false;
+		}
+		if((lhs.tag().equals("VBG") || lhs.tag().equals("VB")) && rhs.tag().equals("PRP")) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -214,12 +213,12 @@ public class Criteria {
 						if(!isVerbNounAgreeing(lhs, rhs)) {
 							//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 							if(!isConjPresent(lhs, rhs, depnsubj, conj))
-								errors1b.addError("Subject-Verb do not agree. [" + depaux.dep() + lhs + "-" + depnsubj.dep() + rhs + "]");
+								errors1b.addError("Subject-Verb do not agree. [" + depnsubj.dep() + rhs + "-" + depaux.dep() + lhs + "]");
 						} else {
 							//check for wrong combinations
 							//check if rhs is prp -> he/she -> lhs shud be singular
 							if(!isPRPAgreeing(taggedWords.get(depaux.dep().index()-1), taggedWords.get(depnsubj.dep().index()-1)))
-								errors1b.addError("Subject-Verb do not agree. [" + depaux.dep() + lhs + "-" + depnsubj.dep() + rhs + "]");
+								errors1b.addError("Subject-Verb do not agree. [" + depnsubj.dep() + rhs + "-" + depaux.dep() + lhs + "]");
 						}
 					}
 				}
@@ -234,12 +233,12 @@ public class Criteria {
 				if(!isVerbNounAgreeing(lhs, rhs)) {
 					//if lhs is plural verb and rhs is singular noun, check for a conj with same noun
 					if(!isConjPresent(lhs, rhs, dep, conj))
-						errors1b.addError("Subject-Verb do not agree. [" + dep.gov() + lhs + "-" + dep.dep() + rhs + "]");
+						errors1b.addError("Subject-Verb do not agree. [" + dep.dep() + rhs + "-" + dep.gov() + lhs + "]");
 				} else {
 					//check for wrong combinations
 					//check if rhs is prp -> he/she -> lhs shud be singular
 					if(!isPRPAgreeing(taggedWords.get(dep.gov().index()-1), taggedWords.get(dep.dep().index()-1)))
-						errors1b.addError("Subject-Verb do not agree. [" + dep.gov() + lhs + "-" + dep.dep() + rhs + "]");
+						errors1b.addError("Subject-Verb do not agree. [" + dep.dep() + rhs + "-" + dep.gov() + lhs + "]");
 				}
 			}
 		}
@@ -270,6 +269,8 @@ public class Criteria {
 	
 	/**
 	 * Check verb agreement for personal pronouns 
+	 * (for subject verb agreement)
+	 * 
 	 * @param lhs
 	 * @param rhs
 	 * @return
@@ -285,14 +286,6 @@ public class Criteria {
 			//the pronouns he/she, cannot have a vbp
 			if(rhs.word().equalsIgnoreCase("he") || rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))
 				return false;
-		}
-		if(lhs.tag().equals("VBN") && rhs.tag().equals("PRP")) {
-			if(rhs.word().equalsIgnoreCase("i") || rhs.word().equalsIgnoreCase("he") 
-					|| rhs.word().equalsIgnoreCase("she") || rhs.word().equalsIgnoreCase("it"))
-				return false;
-		}
-		if((lhs.tag().equals("VBG") || lhs.tag().equals("VB")) && rhs.tag().equals("PRP")) {
-			return false;
 		}
 		return true;
 	}

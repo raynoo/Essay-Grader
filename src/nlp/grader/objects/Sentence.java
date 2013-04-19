@@ -54,17 +54,16 @@ public class Sentence {
 	public void printAllErrors()
 	{
 		boolean status = false;
-		System.out.println(this.toString());
+		System.out.println("\n" + this.toString());
 		System.out.println(getTaggedWords());
-		
 	
 		for(String key :  parseErrors.keySet())
 		{
 			if(parseErrors.get(key).getErrorCount() > 0)
 			{
 				status = true;
-				System.out.println(parseErrors.get(key).toString());
-				System.out.println("***********************");
+				System.out.println("\t" + parseErrors.get(key).toString());
+//				System.out.println("***********************\n");
 			}
 		}
 

@@ -91,7 +91,7 @@ public class Main {
 
 		}
 
-		System.out.println("Number of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+		System.out.println("\nNumber of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
 		System.out.println("Scores are ");
 		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
 		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));

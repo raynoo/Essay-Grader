@@ -339,7 +339,7 @@ public class WordOrder {
 				{
 					String tag = child.get(i).label().value();
 
-					if(tag.contains("NN"))
+					if(tag.contains("NN") || tag.equals("NP"))
 					{
 						tag = "NN";
 					}

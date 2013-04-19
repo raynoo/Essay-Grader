@@ -48,6 +48,7 @@ public class Reader {
 
 			while ( (( line = br.readLine() ) != null) ) 
 			{
+				line = line.trim();
 				if(line.length() > 0) {
 					String temp[] = line.split("\\.");
 
@@ -82,7 +83,7 @@ public class Reader {
 							if(line.contains(store+"."))
 								lines.add(store+".");
 							else
-								if(!store.equals(" "))
+								if(!store.matches("^//s+$"))
 									lines.add(store);
 
 

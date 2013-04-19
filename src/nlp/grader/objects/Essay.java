@@ -84,7 +84,7 @@ public class Essay {
 		}
 			catch(Exception e)
 			{
-				System.out.println("not able to fragment the sentence " + s);
+				//System.out.println("not able to fragment the sentence " + s);
 				this.essay.add(new Sentence(s));
 			}
 		}

@@ -1,0 +1,7 @@
+VB
+VBD
+VBG
+VBN
+VBP
+VBZ
+#MD

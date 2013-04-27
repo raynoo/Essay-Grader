@@ -13,6 +13,9 @@ public class Tags {
 
 	private static HashSet<String> verbTags = null;
 	private static HashSet<String> nounTags = null;
+	private static HashSet<String> femalePRPWords = null;
+	private static HashSet<String> malePRPWords = null;
+	private static HashSet<String> pluralPRPWords = null;
 	
 	public static HashSet<String> getVerbTags() {
 		if(verbTags == null) {

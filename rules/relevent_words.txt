@@ -25,6 +25,8 @@ neighbor
 nephew
 niece
 cousin
+wife
+husband
 
 # pets
 dog

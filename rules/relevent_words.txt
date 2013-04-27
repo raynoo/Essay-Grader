@@ -1,0 +1,56 @@
+# related people
+family
+children
+child
+son
+sons
+daughter
+daughters
+father
+mother
+grand father
+grand mother
+grandfather
+grandmother
+boyfriend
+girlfriend
+friend
+brother
+sister
+uncle
+aunty
+aunt
+neighbour
+neighbor
+nephew
+niece
+cousin
+
+# pets
+dog
+cat
+bird
+parrot
+frog
+rabbit
+pet
+
+#work
+manager
+boss
+owner
+employee
+
+# verb that can come
+# if there are many I,my me then its cool basically first person
+like
+love
+come
+earn
+live
+stay
+hate
+
+
+
+

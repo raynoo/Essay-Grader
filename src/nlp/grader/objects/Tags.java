@@ -115,7 +115,14 @@ public class Tags {
 	}
 	public static boolean isNeutralGender(String word)
 	{
-		return neutralGender.contains(word);
+		
+		if(neutralGender.contains(word))
+		{
+			return true;
+		}
+		
+		System.out.println( word +" is not there in the Neutral Gender list\n If you feel its neutral please add  it to NeutralGender.txt ");
+		return false;
 	}
 	
 	

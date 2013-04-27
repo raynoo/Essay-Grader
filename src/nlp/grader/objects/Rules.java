@@ -27,7 +27,7 @@ public class Rules {
 		if(beforeVerbRules == null) {
 			beforeVerbRules = new HashMap<String, Set<String>>();
 			
-			for(String s : Reader.readFile("rules/1c_before_verb_rules.txt")) {
+			for(String s : Reader.readFile("rules/1d_before_verb_rules.txt")) {
 				String[] rule = s.split("\\s");
 				
 				if(rule.length > 1) {
@@ -52,7 +52,7 @@ public class Rules {
 		if(afterVerbRules == null) {
 			afterVerbRules = new HashMap<String, Set<String>>();
 			
-			for(String s : Reader.readFile("rules/1c_after_verb_rules.txt")) {
+			for(String s : Reader.readFile("rules/1d_after_verb_rules.txt")) {
 				String[] rule = s.split("\\s");
 				
 				if(rule.length > 1) {

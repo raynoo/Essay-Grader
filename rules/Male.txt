@@ -22,6 +22,7 @@ sir
 son
 uncle
 boy-friend
+boyfriend
 grandfather
 great grandfather
 grandson

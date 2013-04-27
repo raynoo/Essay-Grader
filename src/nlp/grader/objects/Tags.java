@@ -21,12 +21,13 @@ public class Tags {
 	private static HashSet<String> verbTags = null;
 	private static HashSet<String> nounTags = null;
 	
-	private static HashSet<String> femalePRPWords = null; // pronoun
-	private static HashSet<String> malePRPWords = null;
-	private static HashSet<String> pluralPRPWords = null;
+	private static HashSet<String> femalePRPWords = new HashSet<String>(); // pronoun
+	private static HashSet<String> malePRPWords =  new HashSet<String>();;
+	private static HashSet<String> pluralPRPWords =  new HashSet<String>();;
 	
-	private static HashSet<String> femaleWords = null;
-	private static HashSet<String> maleWords = null;
+	private static HashSet<String> femaleWords =  new HashSet<String>();;
+	private static HashSet<String> maleWords =  new HashSet<String>();;
+	private static HashSet<String> neutralGender =  new HashSet<String>();;
 	
 	static{
 		String[] fePrp = {"she","her","hers"};
@@ -51,6 +52,14 @@ public class Tags {
 			while( (word = br.readLine().trim()) != null)
 			{
 				femaleWords.add(word);
+			}
+			
+			br.close();
+			
+			br = new BufferedReader(new FileReader("rules/NeutralGender.txt"));
+			while( (word = br.readLine().trim()) != null)
+			{
+				neutralGender.add(word);
 			}
 			
 			br.close();
@@ -106,7 +115,7 @@ public class Tags {
 	}
 	public static boolean isNeutralGender(String word)
 	{
-		throw new NotImplementedException();
+		return neutralGender.contains(word);
 	}
 	
 	

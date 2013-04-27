@@ -36,15 +36,19 @@ public class Sentence {
 
 	public TypedDependency[] getDependencyTree() {
 		return this.parser.getDependencyTree();
-	}	
-
-	public void getWords() {
-
+	}
+	
+	public HashMap<String, ArrayList<TaggedWord>> getTaggedWordsAsMap() {
+		return this.parser.getTaggedWordsAsMap();
 	}
 
-	public void getTags() {
-
-	}
+//	public void getWords() {
+//
+//	}
+//
+//	public void getTags() {
+//
+//	}
 
 	public HashMap<String, ErrorDetails> getErrors() {
 		return this.parseErrors;

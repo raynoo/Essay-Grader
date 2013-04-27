@@ -2,6 +2,7 @@ package nlp.grader.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import nlp.grader.utils.SParserConfig;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -15,6 +16,7 @@ public class SParser {
 	private String inputSentence = null;
 	private Tree parseTree = null;
 	private TypedDependency[] dependencyTree = null;
+	private HashMap<String, ArrayList<TaggedWord>> tagset = null;
 	
 	public SParser(String s) {
 		this.inputSentence = s;
@@ -24,6 +26,8 @@ public class SParser {
 		GrammaticalStructureFactory gsf = new PennTreebankLanguagePack().grammaticalStructureFactory();
 		Collection<TypedDependency> td = gsf.newGrammaticalStructure(this.parseTree).allTypedDependencies();
 		this.dependencyTree = td.toArray(new TypedDependency[0]);
+		
+		this.tagset = new HashMap<String, ArrayList<TaggedWord>>();
 	}
 	
 	/**
@@ -49,16 +53,24 @@ public class SParser {
 	 * @return
 	 */
 	public ArrayList<TaggedWord> getTaggedWords() {
-		return parseTree.taggedYield();
+		return this.parseTree.taggedYield();
 	}
 	
-	public ArrayList<String> getTaggedWordsAsList() {
-		
-//		ArrayList<String> tags;
-//		for(TaggedWord tw : parseTree.taggedYield()) {
-//			tw.
-//		}
-		
-		return null;
+	//hashmap of tags and words
+	public HashMap<String, ArrayList<TaggedWord>> getTaggedWordsAsMap() {
+		if(this.tagset == null) {
+			ArrayList<TaggedWord> tags;
+			
+			for(TaggedWord tw : this.parseTree.taggedYield()) {
+				
+				tags = this.tagset.get(tw.tag());
+				if(tags == null)
+					tags = new ArrayList<TaggedWord>();
+				
+				tags.add(tw);
+				this.tagset.put(tw.tag(), tags);
+			}
+		}
+		return this.tagset;
 	}
 }

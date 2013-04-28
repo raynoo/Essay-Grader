@@ -43,22 +43,25 @@ public class Tags {
 		{
 			String word;
 			BufferedReader br = new BufferedReader(new FileReader("rules/Male.txt"));
-			while( (word = br.readLine().trim()) != null)
+			while( (word = br.readLine()) != null)
 			{
+				word = word.trim();
 				maleWords.add(word);
 			}
 			br.close();
 			br = new BufferedReader(new FileReader("rules/Female.txt"));
-			while( (word = br.readLine().trim()) != null)
+			while( (word = br.readLine() ) != null)
 			{
+				word = word.trim();
 				femaleWords.add(word);
 			}
 			
 			br.close();
 			
 			br = new BufferedReader(new FileReader("rules/NeutralGender.txt"));
-			while( (word = br.readLine().trim()) != null)
+			while( (word = br.readLine()) != null)
 			{
+				word = word.trim();
 				neutralGender.add(word);
 			}
 			

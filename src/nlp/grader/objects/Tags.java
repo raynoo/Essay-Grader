@@ -24,16 +24,21 @@ public class Tags {
 	
 	private static HashSet<String> femaleWords =  new HashSet<String>();;
 	private static HashSet<String> maleWords =  new HashSet<String>();;
-	private static HashSet<String> neutralGender =  new HashSet<String>();;
+	private static HashSet<String> neutralGender =  new HashSet<String>();
+	
+	private static HashSet<String> personalPrp = new HashSet<String>();
 	
 	static{
 		String[] fePrp = {"she","her","hers"};
 		String[] maPrp = {"he","his","him"};
 		String[] plPrp = {"we","they","them","their","those","us"};
+		String[] persPrp = {"I","me","my"};
 		
 		femalePRPWords.addAll(Arrays.asList(fePrp));
 		malePRPWords.addAll(Arrays.asList(maPrp));
 		pluralPRPWords.addAll(Arrays.asList(plPrp));
+		
+		personalPrp.addAll(Arrays.asList(persPrp));
 		
 		
 		try 
@@ -123,6 +128,16 @@ public class Tags {
 		
 		System.out.println( word +" is not there in the Neutral Gender list\n If you feel its neutral please add  it to NeutralGender.txt ");
 		return false;
+	}
+	
+	/**
+	 * for 2 b
+	 * @param word
+	 * @return
+	 */
+	public static boolean isPersonalPrp(String word)
+	{
+		return personalPrp.contains(word);
 	}
 	
 	

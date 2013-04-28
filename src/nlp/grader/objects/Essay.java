@@ -1,6 +1,7 @@
 package nlp.grader.objects;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,11 +14,13 @@ public class Essay {
 
 	private List<Sentence> essay;
 	private Points essayPoints;
-
+	int twoBScore;
+	
+	
 	public Essay(List<String> sentences) {
 
-
 		this.essay = new ArrayList<Sentence>();
+		
 		for(String s : sentences)
 		{
 			try{
@@ -99,5 +102,15 @@ public class Essay {
 	public Points getPoints() {
 		return this.essayPoints;
 	}
+
+	public int getTwoBScore() {
+		return twoBScore;
+	}
+
+	public void setTwoBScore(int twoBScore) {
+		this.twoBScore = twoBScore;
+	}
+	
+	
 
 }

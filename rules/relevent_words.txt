@@ -20,39 +20,10 @@ sister
 uncle
 aunty
 aunt
-neighbour
-neighbor
 nephew
 niece
 cousin
 wife
 husband
-
-# pets
-dog
-cat
-bird
-parrot
-frog
-rabbit
-pet
-
-#work
-manager
-boss
-owner
-employee
-
-# verb that can come
-# if there are many I,my me then its cool basically first person
-like
-love
-come
-earn
-live
-stay
-hate
-
-
-
-
+grandson
+granddaughter

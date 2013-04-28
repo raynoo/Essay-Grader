@@ -76,33 +76,37 @@ public class Main {
 		float c1 = 0;
 		float n = essay.getSentences().size();
 
-		for(Sentence s : essay.getSentences()) {
-
-			WordOrder.getWordOrderErrors(s);
-			Criteria.isVerbNounAgreeing(s);
-			Criteria.isVerbAgreeing(s);
-
-			b1+=s.getErrors().get("1b").getErrorCount();
-			a1+=s.getErrors().get("1a").getErrorCount();
-			c1+=s.getErrors().get("1c").getErrorCount();
-
-			if(printErrorDetails)
-				s.printAllErrors();
-
-		}
-
-		System.out.println("\nNumber of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
-		System.out.println("Scores are ");
-		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
-		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
-		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
+		SemanticTwoB.processSecondPart(essay);
 		
-		if(n >= 5)
-			System.out.println("3a = 5");
-		else
-			System.out.println("3a = " + n);
-		
-		System.out.println("\n--------------------------------------------\n");
+//		for(Sentence s : essay.getSentences()) {
+//
+//			WordOrder.getWordOrderErrors(s);
+//			Criteria.isVerbNounAgreeing(s);
+//			Criteria.isVerbAgreeing(s);
+//
+//			b1+=s.getErrors().get("1b").getErrorCount();
+//			a1+=s.getErrors().get("1a").getErrorCount();
+//			c1+=s.getErrors().get("1c").getErrorCount();
+//
+//			if(printErrorDetails)
+//				s.printAllErrors();
+//
+//		}
+//
+//		
+//		
+//		System.out.println("\nNumber of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+//		System.out.println("Scores are ");
+//		System.out.println("1a = " + Math.round((5 * ((n-a1)/n) )));
+//		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
+//		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
+//		
+//		if(n >= 5)
+//			System.out.println("3a = 5");
+//		else
+//			System.out.println("3a = " + n);
+//		
+//		System.out.println("\n--------------------------------------------\n");
 	}
 
 	/**

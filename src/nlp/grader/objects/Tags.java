@@ -96,32 +96,32 @@ public class Tags {
 	
 	public static boolean isFemalePrp(String word)
 	{
-		return femalePRPWords.contains(word);
+		return femalePRPWords.contains(word.toLowerCase());
 	}
 	
 	public static boolean isMalePrp(String word)
 	{
-		return malePRPWords.contains(word);
+		return malePRPWords.contains(word.toLowerCase());
 	}
 	
 	public static boolean isPluralPrp(String word)
 	{
-		return pluralPRPWords.contains(word);
+		return pluralPRPWords.contains(word.toLowerCase());
 	}
 	
 	public static boolean isFemaleWord(String word)
 	{
-		return femaleWords.contains(word);
+		return femaleWords.contains(word.toLowerCase());
 	}
 	
 	public static boolean isMaleWord(String word)
 	{		
-		return maleWords.contains(word);
+		return maleWords.contains(word.toLowerCase());
 	}
 	public static boolean isNeutralGender(String word)
 	{
 		
-		if(neutralGender.contains(word))
+		if(neutralGender.contains(word.toLowerCase()))
 		{
 			return true;
 		}
@@ -137,7 +137,7 @@ public class Tags {
 	 */
 	public static boolean isPersonalPrp(String word)
 	{
-		return personalPrp.contains(word);
+		return personalPrp.contains(word.toLowerCase());
 	}
 	
 	

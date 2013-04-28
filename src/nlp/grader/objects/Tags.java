@@ -1,12 +1,9 @@
 package nlp.grader.objects;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashSet;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import nlp.grader.utils.Reader;
 

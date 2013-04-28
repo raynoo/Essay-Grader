@@ -26,8 +26,6 @@ public class SParser {
 		GrammaticalStructureFactory gsf = new PennTreebankLanguagePack().grammaticalStructureFactory();
 		Collection<TypedDependency> td = gsf.newGrammaticalStructure(this.parseTree).allTypedDependencies();
 		this.dependencyTree = td.toArray(new TypedDependency[0]);
-		
-		this.tagset = new HashMap<String, ArrayList<TaggedWord>>();
 	}
 	
 	/**
@@ -59,6 +57,8 @@ public class SParser {
 	//hashmap of tags and words
 	public HashMap<String, ArrayList<TaggedWord>> getTaggedWordsAsMap() {
 		if(this.tagset == null) {
+			this.tagset = new HashMap<String, ArrayList<TaggedWord>>();
+			
 			ArrayList<TaggedWord> tags;
 			
 			for(TaggedWord tw : this.parseTree.taggedYield()) {

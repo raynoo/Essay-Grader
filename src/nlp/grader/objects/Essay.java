@@ -1,12 +1,10 @@
 package nlp.grader.objects;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Stack;
 
 import edu.stanford.nlp.trees.Tree;
 
@@ -15,7 +13,7 @@ public class Essay {
 	private List<Sentence> originalSentence;
 	private List<Sentence> essay;
 	private Points essayPoints;
-	int twoBScore;
+	int twoBScore, twoAScore;
 	String filename;
 
 	public String getFilename(){
@@ -123,6 +121,12 @@ public class Essay {
 		this.twoBScore = twoBScore;
 	}
 
+	public int getTwoAScore() {
+		return twoBScore;
+	}
 
+	public void setTwoAScore(int twoAScore) {
+		this.twoAScore = twoAScore;
+	}
 
 }

@@ -4,8 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import nlp.grader.objects.Essay;
 import nlp.grader.objects.Sentence;
@@ -18,7 +17,6 @@ import nlp.grader.utils.Reader;
  *
  */
 public class Main {
-
 
 	static boolean printErrorDetails = false;
 	static StringBuffer outputString = null;
@@ -58,7 +56,11 @@ public class Main {
 		}
 		else
 		{
-			for(File file : corpusPath.listFiles()) {
+			//making sure its sorted
+			File[] files = corpusPath.listFiles();
+			Arrays.sort(files);
+			
+			for(File file : files) {
 				if(file.isFile()) {		
 					Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()),file.getName());
 					grader.checkEssay(essay);
@@ -78,9 +80,8 @@ public class Main {
 		float n = essay.getSentences().size();
 		float d1 = 0, a1 = 0, b1 = 0, c1 = 0, a2 = 0, b2 = 0, a3 = n, finalgrade = 0;
 
-		System.out.println(essay.getFilename());
 		
-		//Part 1
+		//Part 1 - 1a, 1b, 1c, 3
 		for( Sentence s : essay.getOriginalSentence() ) {
 
 			WordOrder.getWordOrderErrors(s);
@@ -94,38 +95,37 @@ public class Main {
 			if(printErrorDetails)
 				s.printAllErrors();
 		}
-		
-		System.out.println("\nNumber of sentences = " + n + ", number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
-		System.out.println("Scores are ");
-		System.out.println("1a = " + this.calculatePoints(a1, n));
-		System.out.println("1b = " + this.calculatePoints(b1, n));
-		System.out.println("1c = " + this.calculatePoints(c1, n));
-		
 		if(n >= 5)
 			a3 = 5;
 		
-		System.out.println("3a = " + a3);
-
-		
-		
-		//Part 2
+		//Part 2 - 1d, 2a, 2b 
 		SemanticTwoA.processSecondPart(essay); // calculate 2a score
-//		a2 = essay.getTwoBScore();
-		SemanticTwoB.processSecondPart(essay); // calculate two b score		
+		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
+		a2 = calculatePoints(essay.getTwoBScore(), essay.getOriginalSentence().size());
 		b2 = essay.getTwoBScore();
 		d1 = getOneD(essay);
 		
-		System.out.println("1d = " + d1 );
-		System.out.println("2a = " + this.calculatePoints(a2, n));
+		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3);
+		
+		
+		
+		System.out.println(essay.getFilename() + "\n");
+		System.out.println("Number of sentences = " + n);
+		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+		System.out.println("number of 1d error = " + d1 + ", number of 2a error = " + a2 + ", number of 2b error = " + b2 + ", number of 3a error = " + a3);
+		System.out.println("\nScores are:");
+		System.out.println("1a = " + calculatePoints(a1, n));
+		System.out.println("1b = " + calculatePoints(b1, n));
+		System.out.println("1c = " + calculatePoints(c1, n));
+		System.out.println("1d = " + d1);
+		System.out.println("2a = " + a2);
 		System.out.println("2b = " + b2);
-		
-		finalgrade = calculateFinalGrade(a1, b1, c1, d1, a2, b2, 0);
+		System.out.println("3a = " + a3);
 		System.out.println("Final Grade: " + finalgrade);
-		
 		
 		System.out.println("\n--------------------------------------------\n");
 		
-		updateOutputString(a1, b1, c1, d1, a2, b2, a3, finalgrade);
+		updateOutputString(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3, finalgrade);
 	}
 
 	private static void updateOutputString(float a1, float b1, float c1, float d1, 
@@ -187,17 +187,12 @@ public class Main {
 
 	}
 	
-	/**
-	 * Assign a point (1-5) for each criteria according to number of errors. 
-	 */
-	private int calculatePoints(float errorNumber, float essaySize) {
+	//Assign a point (1-5) for each criteria according to number of errors.
+	static int calculatePoints(float errorNumber, float essaySize) {
 		return Math.round(5 * ( (essaySize - errorNumber) / essaySize) );
 	}
 
-	/**
-	 * Calculate the final grade as per essay Points.
-	 */
-	private float calculateFinalGrade(float a1, float b1, float c1, float d1, float a2, float b2, float a3) {
+	private static float calculateFinalGrade(float a1, float b1, float c1, float d1, float a2, float b2, float a3) {
 		float score = (a1 + b1 + c1 + 2*d1 + a2 + 3*b2 + a3) / 10;
 		float decimal = score - (int) score;
 		

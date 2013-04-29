@@ -21,16 +21,6 @@ public class SemanticTwoA
 	private static HashSet<String> thirdSingularSet = null;
 	private static HashSet<String> thirdPluralSet = null;
 	
-//	public static void main(String[] args) {
-//		sentences = new ArrayList<Sentence>();
-//		sentences.add(new Sentence("My son is 2 years old."));
-//		sentences.add(new Sentence("I love him very much."));
-//		
-//		List<TaggedWord> antecedents = getAntecedentNouns(new TaggedWord(), 1, 2);
-//		
-//		System.out.println(antecedents);
-//	}
-	
 	private static boolean isThirdSingular(String pronoun) {
 		if(thirdSingularSet == null) {
 			thirdSingularSet = new HashSet<String>(Arrays.asList(thirdSingular));
@@ -46,7 +36,8 @@ public class SemanticTwoA
 	}
 	
 	public static void processSecondPart(Essay essay) {
-		sentences = essay.getSentences();
+		sentences = essay.getOriginalSentence();
+		int errorCount = 0;
 
 		for(int i = 0; i < sentences.size(); i++) {
 			Sentence sentence = sentences.get(i);
@@ -72,7 +63,7 @@ public class SemanticTwoA
 					if(isThirdSingular(word.word())) {
 						List<TaggedWord> antecedents = getAntecedentNouns(word, i, j);
 
-						if(antecedents.isEmpty()) {
+						if(antecedents == null || antecedents.isEmpty()) {
 							ed.addError("Missing antecedent for pronoun. [" + word + " in sentence " + i + "]");
 							continue;
 						}
@@ -102,19 +93,20 @@ public class SemanticTwoA
 
 				}
 			}
-
+			errorCount += ed.getErrorCount();
 			sentence.getErrors().put("2a", ed);
 		}
+		essay.setTwoAScore(Main.calculatePoints(errorCount, sentences.size()));
 	}
 	
 	private static boolean checkGender(String pronounWord, String nounWord) {
 		if(Tags.isMalePrp(pronounWord) && (Tags.isMaleWord(nounWord) || Tags.isNeutralGender(nounWord))) {
-			System.out.println("Matched: " + pronounWord + " - " + nounWord);
+//			System.out.println("Matched: " + pronounWord + " - " + nounWord);
 			return true;
 		}
 		
 		if(Tags.isFemalePrp(pronounWord) && (Tags.isFemaleWord(nounWord) || Tags.isNeutralGender(nounWord))) {
-			System.out.println("Matched: " + pronounWord + " - " + nounWord);
+//			System.out.println("Matched: " + pronounWord + " - " + nounWord);
 			return true;
 		}
 //		System.out.println("Not Matched: " + pronounWord + " - " + nounWord);

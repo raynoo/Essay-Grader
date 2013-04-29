@@ -108,7 +108,7 @@ public class Tags {
 			return true;
 		}
 		
-		System.out.println( word +" is not there in the Neutral Gender list\n If you feel its neutral please add  it to NeutralGender.txt ");
+//		System.out.println( word +" is not there in the Neutral Gender list\n If you feel its neutral please add  it to NeutralGender.txt ");
 		return false;
 	}
 	

@@ -1,6 +1,8 @@
 package nlp.grader.main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -14,90 +16,108 @@ import nlp.grader.objects.Tags;
 public class SemanticTwoA
 {
 	private static List<Sentence> sentences = null;
-//	private static Essay essay;
-//	HashMap<Integer, Sentence> sentences = new HashMap<Integer, Sentence>();
+	private static String[] thirdSingular = {"he", "she", "him", "her", "his", "her", "hers"};
+	private static String[] thirdPlural = {"they", "them", "their", "theirs", "those"};//we, us?
+	private static HashSet<String> thirdSingularSet = null;
+	private static HashSet<String> thirdPluralSet = null;
 	
+//	public static void main(String[] args) {
+//		sentences = new ArrayList<Sentence>();
+//		sentences.add(new Sentence("My son is 2 years old."));
+//		sentences.add(new Sentence("I love him very much."));
+//		
+//		List<TaggedWord> antecedents = getAntecedentNouns(new TaggedWord(), 1, 2);
+//		
+//		System.out.println(antecedents);
+//	}
 	
-	public static void main(String[] args) {
-		sentences = new ArrayList<Sentence>();
-		sentences.add(new Sentence("My son is 2 years old."));
-		sentences.add(new Sentence("I love him very much."));
-		
-		List<TaggedWord> antecedents = getAntecedentNoun(new TaggedWord(), 1, 2);
-		
-		System.out.println(antecedents);
+	private static boolean isThirdSingular(String pronoun) {
+		if(thirdSingularSet == null) {
+			thirdSingularSet = new HashSet<String>(Arrays.asList(thirdSingular));
+		}
+		return thirdSingularSet.contains(pronoun);
 	}
 	
+	private static boolean isThirdPlural(String pronoun) {
+		if(thirdPluralSet == null) {
+			thirdPluralSet = new HashSet<String>(Arrays.asList(thirdPlural));
+		}
+		return thirdPluralSet.contains(pronoun);
+	}
 	
-	public static void processSecondPart(Essay essay)
-	{
-		if(sentences == null)
-			sentences = essay.getSentences();
-		
+	public static void processSecondPart(Essay essay) {
+		sentences = essay.getSentences();
+
 		for(int i = 0; i < sentences.size(); i++) {
 			Sentence sentence = sentences.get(i);
-			
+
 			ErrorDetails ed = sentence.getErrors().get("2a");
-			if(ed == null) {
+			if(ed == null)
 				ed = new ErrorDetails("2a");
-			}
-			
+
 			//check for 2nd person pronoun
 			if(hasSecondPerson(sentence))
 				ed.addError("Second person pronoun present. [sentence " + i + "]");
-			
+
 			//check for 3rd person pronoun
 			//and check for prev noun (in upto 2 sentences back)
-//			ArrayList<TaggedWord> words = sentence.getTaggedWordsAsMap().get("PRP");
 			ArrayList<TaggedWord> words = sentence.getTaggedWords();
-			
+
 			for(int j = 0; j < words.size(); j++) {
 				TaggedWord word = words.get(j);
-				
-				//if he/she then check antecedent's gender
-				if(word.tag().equals("PRP") && (word.word().equalsIgnoreCase("he") 
-						|| word.word().equalsIgnoreCase("she"))) {
-					
-					List<TaggedWord> antecedents = getAntecedentNoun(word, i, j);
-					
-					if(antecedents.isEmpty()) {
-						ed.addError("Missing antecedent for pronoun. [" + word + " in sentence " + i + "]");
-						continue;
-					}
-					
-					TaggedWord genderMatch = null, numberMatch = null;
-					for(TaggedWord t : antecedents) {
-						//check gender
-						//word, antecedents
-						if(genderMatch == null && checkGender(word.word(), t.word())) {
-							genderMatch = t;
+
+				if(word.tag().equals("PRP") || word.tag().equals("PRP$")) {
+
+					//if he/she then check antecedent's gender
+					if(isThirdSingular(word.word())) {
+						List<TaggedWord> antecedents = getAntecedentNouns(word, i, j);
+
+						if(antecedents.isEmpty()) {
+							ed.addError("Missing antecedent for pronoun. [" + word + " in sentence " + i + "]");
+							continue;
 						}
-						
-						//check number
-						if(numberMatch == null && checkNumber(word.word(), t.word())) {
-							numberMatch = t;
+
+						TaggedWord genderMatch = null;
+						for(TaggedWord t : antecedents) {
+							//check gender
+							if(genderMatch == null && checkGender(word.word(), t.word())) {
+								genderMatch = t;
+								break;
+							}
 						}
-						
+						if(genderMatch == null)
+							ed.addError("No antecedent / Gender-mismatch for pronoun. [" + word + "]");
+
 					}
-					if(genderMatch == null)
-						ed.addError("Gender mismatch for pronoun. [" + word + "]");
-					if(numberMatch == null)
-						ed.addError("Number mismatch for pronoun. [" + word + "]");
+					//if they/them/their check for plural noun
+					else if(isThirdPlural(word.word())) {
+						TaggedWord numberMatch = null;
+//						//check number
+//						if(numberMatch == null && checkNumber(word.word(), t.word())) {
+//							numberMatch = t;
+//						}
+//						if(numberMatch == null)
+//							ed.addError("Number mismatch for pronoun. [" + word + "]");
+					}
+
 				}
 			}
-			
-			
+
 			sentence.getErrors().put("2a", ed);
 		}
 	}
 	
 	private static boolean checkGender(String pronounWord, String nounWord) {
-		if(Tags.isMalePrp(pronounWord) && (Tags.isMaleWord(nounWord) || Tags.isNeutralGender(nounWord)))
+		if(Tags.isMalePrp(pronounWord) && (Tags.isMaleWord(nounWord) || Tags.isNeutralGender(nounWord))) {
+			System.out.println("Matched: " + pronounWord + " - " + nounWord);
 			return true;
+		}
 		
-		if(Tags.isFemalePrp(pronounWord) && (Tags.isFemaleWord(nounWord) || Tags.isNeutralGender(nounWord)))
+		if(Tags.isFemalePrp(pronounWord) && (Tags.isFemaleWord(nounWord) || Tags.isNeutralGender(nounWord))) {
+			System.out.println("Matched: " + pronounWord + " - " + nounWord);
 			return true;
-		
+		}
+//		System.out.println("Not Matched: " + pronounWord + " - " + nounWord);
 		return false;
 	}
 	
@@ -106,13 +126,13 @@ public class SemanticTwoA
 				&& (nounTag.equals("NNS") || nounTag.equals("NN")))
 			return true;
 		
-		if(Tags.isPluralPrp(pronounWord) && (nounTag.equals("NNP")))
+		if(Tags.isPluralPrp(pronounWord) && (nounTag.equals("NNP") || nounTag.equals("NNPS")))
 			return true;
 		
 		return false;
 	}
 	
-	private static List<TaggedWord> getAntecedentNoun(TaggedWord pronounWord, int sentenceIndex, int wordIndex) {
+	private static List<TaggedWord> getAntecedentNouns(TaggedWord pronounWord, int sentenceIndex, int wordIndex) {
 		List<TaggedWord> ante = new ArrayList<TaggedWord>();
 		
 		for(int i = 0; i < 3 && sentenceIndex >= 0; i++) {
@@ -125,7 +145,8 @@ public class SemanticTwoA
 			
 			while(iter.hasPrevious()) {
 				TaggedWord word = iter.previous();
-				if(Criteria.isNounTag(word.tag()) && !word.tag().equals("PRP")) {
+				
+				if(Tags.isNounTag(word.tag()) && !word.tag().equals("PRP")) {
 					ante.add(word);
 				}
 			}
@@ -143,21 +164,11 @@ public class SemanticTwoA
 		
 		if(words != null) {
 			for(TaggedWord t : words) {
-				if(t.value().equalsIgnoreCase("you") || t.value().equalsIgnoreCase("your"))
+				if(t.value().contains("you"))
 					return true;
 			}
 		}
 		return false;
 	}
 	
-	private static boolean hasThirdPerson(Sentence sentence, ErrorDetails ed) {
-		ArrayList<TaggedWord> words = sentence.getTaggedWordsAsMap().get("PRP");
-		
-		for(TaggedWord t : words) {
-//			if(t.value() == 3rd person)
-//				return true;
-		}
-		
-		return false;
-	}
 }

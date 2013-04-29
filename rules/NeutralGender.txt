@@ -1,2 +1,3 @@
 friend
 boss
+supervisor

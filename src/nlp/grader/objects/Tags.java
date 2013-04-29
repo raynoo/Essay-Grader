@@ -76,24 +76,6 @@ public class Tags {
 		
 	}
 	
-	
-		
-	public static HashSet<String> getVerbTags() {
-		if(verbTags == null) {
-			verbTags = new HashSet<String>();
-			verbTags.addAll(Reader.readFile("rules/verb_tags.txt"));
-		}
-		return verbTags;
-	}
-	
-	public static HashSet<String> getNounTags() {
-		if(nounTags == null) {
-			nounTags = new HashSet<String>();
-			nounTags.addAll(Reader.readFile("rules/noun_tags.txt"));
-		}
-		return nounTags;
-	}
-	
 	public static boolean isFemalePrp(String word)
 	{
 		return femalePRPWords.contains(word.toLowerCase());
@@ -140,6 +122,20 @@ public class Tags {
 		return personalPrp.contains(word.toLowerCase());
 	}
 	
+	public static boolean isVerbTag(String tag) {
+		if(verbTags == null) {
+			verbTags = new HashSet<String>();
+			verbTags.addAll(Reader.readFile("rules/verb_tags.txt"));
+		}
+		return verbTags.contains(tag);
+	}
 	
+	public static boolean isNounTag(String tag) {
+		if(nounTags == null) {
+			nounTags = new HashSet<String>();
+			nounTags.addAll(Reader.readFile("rules/noun_tags.txt"));
+		}
+		return nounTags.contains(tag);
+	}
 	
 }

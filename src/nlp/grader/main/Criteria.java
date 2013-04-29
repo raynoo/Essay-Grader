@@ -40,7 +40,7 @@ public class Criteria {
 		//keep track of first verb
         TaggedWord firstVerb = null;
         for(int j = 0; j < taggedWords.size(); j++) {
-			if(isVerbTag(taggedWords.get(j).tag())) {
+			if(Tags.isVerbTag(taggedWords.get(j).tag())) {
 				firstVerb = taggedWords.get(j);
 				break;
 			}
@@ -67,13 +67,13 @@ public class Criteria {
         		TaggedWord prevVerb = taggedWords.get(j-1), mainVerb = taggedWords.get(j);//, nextVerb = taggedWords.get(j+1);
 
         		//4. is there a verb after modal?
-        		if(prevVerb.tag().equals("MD") && !isVerbTag(mainVerb.tag())) {
+        		if(prevVerb.tag().equals("MD") && !Tags.isVerbTag(mainVerb.tag())) {
         			errors1c.addError("Incorrect Verb order (no verb after modal). [" + prevVerb + "-" + mainVerb + "]");
         		}
 
         		if(prevVerb.tag().equals("PRP")) {
         			//5. if there is prp, is it followed by verb?
-        			if(!isVerbTag(mainVerb.tag()) && !mainVerb.tag().equalsIgnoreCase("them") 
+        			if(!Tags.isVerbTag(mainVerb.tag()) && !mainVerb.tag().equalsIgnoreCase("them") 
         					&& !mainVerb.tag().equalsIgnoreCase("us") && !mainVerb.tag().equalsIgnoreCase("him")
         					&& !mainVerb.tag().equalsIgnoreCase("her") && !mainVerb.tag().equalsIgnoreCase(".")) {
         				errors1c.addError("Missing verb after PRP. [" + prevVerb + "]");
@@ -83,7 +83,7 @@ public class Criteria {
         				errors1c.addError("Missing verb after PRP. [" + prevVerb + "-" + mainVerb + "]");
         		}
 
-        		if(isVerbTag(mainVerb.tag())) {
+        		if(Tags.isVerbTag(mainVerb.tag())) {
 
         			//7, 8. does word before/after a gerund agree?
         			if(mainVerb.tag().equals("VBG")) {
@@ -91,13 +91,13 @@ public class Criteria {
         					errors1c.addError("Incorrect Verb order (word before gerund). [" + prevVerb + "-" + mainVerb + "]");
         				}
         				//cannot have verb after gerund.
-        				if( (j+1 < taggedWords.size()) && ( isVerbTag(taggedWords.get(j+1).tag())  ) ) { //|| taggedWords.get(j+1).tag().equals("NN")
+        				if( (j+1 < taggedWords.size()) && ( Tags.isVerbTag(taggedWords.get(j+1).tag())  ) ) { //|| taggedWords.get(j+1).tag().equals("NN")
         					errors1c.addError("Incorrect Verb order (word after gerund). [" + mainVerb + "-" + taggedWords.get(j+1) + "]");
         				}
         			}
 
         			//8. does verb verb agree?
-        			if(isVerbTag(prevVerb.tag()) && !mainVerb.tag().equals("VBG")) {
+        			if(Tags.isVerbTag(prevVerb.tag()) && !mainVerb.tag().equals("VBG")) {
         				if(!verbVerbRules.get(prevVerb.tag()).contains(mainVerb.tag())) {
         					errors1c.addError("Incorrect Verb(s) order. [" + prevVerb + "-" + mainVerb + "]");
         				}
@@ -245,8 +245,8 @@ public class Criteria {
 		
 		//parse through sentence to get consecutive noun-verb pairs
 		for(int i = 0; i < taggedWords.size(); i++) {
-			if(isNounTag(taggedWords.get(i).tag()) 
-					&& i != taggedWords.size()-1 && isVerbTag(taggedWords.get(i+1).tag())) {
+			if(Tags.isNounTag(taggedWords.get(i).tag()) 
+					&& i != taggedWords.size()-1 && Tags.isVerbTag(taggedWords.get(i+1).tag())) {
 
 				TaggedWord noun = taggedWords.get(i), verb = taggedWords.get(i+1);
 				boolean alreadyProcessed = false;
@@ -327,7 +327,7 @@ public class Criteria {
 		List<Rule> verbNounRules = Rules.getVerbNounRules();
 
 		//nsubj's governor is not a verb in all cases. it can be adjective or noun.
-		if(isVerbTag(lhs)) {
+		if(Tags.isVerbTag(lhs)) {
 			for(Rule r : verbNounRules) {
 				if(r.lhs().equals(lhs) && r.rhs().equals(rhs))
 					return true;
@@ -335,23 +335,7 @@ public class Criteria {
 			return false;
 		}
 		return true;
-}
-	
-	/**
-	 * Is a tag that of a verb?
-	 * @param tag
-	 * @return
-	 */
-	private static boolean isVerbTag(String tag) {
-		return Tags.getVerbTags().contains(tag);
 	}
 	
-	/**
-	 * Is a tag that of a noun?
-	 * @param tag
-	 * @return
-	 */
-	private static boolean isNounTag(String tag) {
-		return Tags.getNounTags().contains(tag);
-	}
+	
 }

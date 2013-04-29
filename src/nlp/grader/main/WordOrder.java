@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import nlp.grader.objects.ErrorDetails;
+import nlp.grader.objects.Essay;
 import nlp.grader.objects.Sentence;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
@@ -362,6 +363,23 @@ public class WordOrder {
 			}
 
 		}
+	}
+	
+	public static int countSbar( Essay essay ){
+
+		int count = 0;
+		for(Sentence s : essay.getOriginalSentence())
+		{
+			
+			for(Tree t : s.getParseTree() )
+			{
+				if ("SBAR".equals(t.value()))
+				{
+					count++;
+				}
+			}
+		}
+		return count;
 	}
 
 

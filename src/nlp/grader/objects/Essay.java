@@ -16,13 +16,16 @@ public class Essay {
 	private List<Sentence> essay;
 	private Points essayPoints;
 	int twoBScore;
+	String filename;
 
+	public String getFilename(){
+		return filename;
+	}
 
-	public Essay(List<String> sentences) {
-
+	public Essay(List<String> sentences,String filename) {
+		this.filename = filename;
 		this.essay = new ArrayList<Sentence>();
 		this.originalSentence = new ArrayList<Sentence>();
-
 
 		for(String s : sentences)
 		{

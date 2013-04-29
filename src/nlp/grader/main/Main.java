@@ -46,19 +46,16 @@ public class Main {
 		}
 
 		if(corpusPath.isFile())
-		{
-			System.out.println(corpusPath.getName());
-			Essay essay = new Essay(Reader.readTestingFile(corpusPath.getAbsolutePath()));
+		{			
+			Essay essay = new Essay(Reader.readTestingFile(corpusPath.getAbsolutePath()),corpusPath.getName());
 			grader.checkEssay(essay);
 		}
 		else
 		{
 			for(File file : corpusPath.listFiles()) {
-				if(file.isFile()) {
-					System.out.println(file.getName());
-					Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()));
+				if(file.isFile()) {		
+					Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()),file.getName());
 					grader.checkEssay(essay);
-
 				}
 			}
 		}
@@ -71,14 +68,14 @@ public class Main {
 	 * @return Points object
 	 */
 	public void checkEssay(Essay essay) {
-		float a1 = 0;
-		float b1 = 0;
-		float c1 = 0;
-		float n = essay.getSentences().size();
-
-		SemanticTwoB.processSecondPart(essay);
-		
-//		for(Sentence s : essay.getSentences()) {
+		float d1 = 0;
+//		float a1 = 0;
+//		float b1 = 0;
+//		float c1 = 0;
+//		float n = essay.getSentences().size();
+//
+//		
+//		for( Sentence s : essay.getOriginalSentence() ) {
 //
 //			WordOrder.getWordOrderErrors(s);
 //			Criteria.isVerbNounAgreeing(s);
@@ -90,7 +87,6 @@ public class Main {
 //
 //			if(printErrorDetails)
 //				s.printAllErrors();
-//
 //		}
 //
 //		
@@ -101,14 +97,58 @@ public class Main {
 //		System.out.println("1b = " + Math.round((5 * ((n-b1)/n) )));
 //		System.out.println("1c = " + Math.round((5 * ((n-c1)/n) )));
 //		
+//		
 //		if(n >= 5)
 //			System.out.println("3a = 5");
 //		else
 //			System.out.println("3a = " + n);
-//		
-//		System.out.println("\n--------------------------------------------\n");
+		
+		SemanticTwoB.processSecondPart(essay); // calculate two b score		
+		d1 = getOneD(essay);
+				
+		System.out.println("1d =  " +d1 );
+		System.out.println("2b = " + essay.getTwoBScore() );		
+		
+		System.out.println("\n--------------------------------------------\n");
 	}
 
+	
+	private static int getOneD(Essay essay)
+	{
+		float d1 = 0;
+		int sbar = WordOrder.countSbar(essay);
+		int temp1 = 0,temp2 = 0,temp3 = 0;
+		
+		int originalSentenceNumber = essay.getOriginalSentence().size();
+		for(Sentence s : essay.getOriginalSentence()){
+			WordOrder.getWordOrderErrors(s);
+			Criteria.isVerbNounAgreeing(s);
+			Criteria.isVerbAgreeing(s);
+			
+			temp1+=s.getErrors().get("1b").getErrorCount();
+			temp2+=s.getErrors().get("1a").getErrorCount();
+			temp3+=s.getErrors().get("1c").getErrorCount();
+		}
+		
+		float ratio = (sbar+temp1 + temp2 + temp3)/(float)originalSentenceNumber;
+		
+		if(ratio < .5){
+			d1 = 5;
+			System.out.println(essay.getFilename());
+		}
+		else if(ratio<=1.3){
+			d1 = 4;
+			System.out.println(essay.getFilename());
+		}
+		if(ratio > 1.3){
+			d1 = 1;
+			System.out.println(essay.getFilename());
+		}
+		
+		return (int)d1;
+
+	}
+	
 	/**
 	 * Assign a point (1-5) for each criteria according to number of errors. 
 	 */

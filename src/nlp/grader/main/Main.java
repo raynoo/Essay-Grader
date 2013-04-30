@@ -76,9 +76,9 @@ public class Main {
 	 * @param essay
 	 * @return Points object
 	 */
-	public void checkEssay(Essay essay) {
+	private void checkEssay(Essay essay) {
 		float n = essay.getSentences().size();
-		float d1 = 0, a1 = 0, b1 = 0, c1 = 0, a2 = 0, b2 = 0, a3 = n, finalgrade = 0;
+		float d1 = 0, a1 = 0, b1 = 0, c1 = 0, twoA = 0, twoB = 0, a3 = n, finalgrade = 0;
 
 		
 		//Part 1 - 1a, 1b, 1c, 3
@@ -101,20 +101,20 @@ public class Main {
 		//Part 2 - 1d, 2a, 2b 
 		d1 = getOneD(essay);
 		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
-		b2 = essay.getTwoBScore();
+		twoB = essay.getTwoBScore();
 		
 		
 		
 		//2a crap
 		SemanticTwoA.processSecondPart(essay); // calculate 2a score
 		int sbars = WordOrder.countSbar(essay);
-		int twoa = essay.getTwoAErrors();
-		essay.setTwoAErrors( (int) (twoa + ((sbars) + b1)) );
+		int twoAErrors = essay.getTwoAErrors();
+		essay.setTwoAErrors( (int) (twoAErrors + ((sbars) + b1)) );
 		essay.setTwoAScore(calculatePoints(essay.getTwoAErrors(), essay.getOriginalSentence().size()));
-		System.out.println("2a: " + twoa + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
-		a2 = essay.getTwoAScore();
+//		System.out.println("2a: " + twoAErrors + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
+		twoA = essay.getTwoAScore();
 		
-		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3);
+		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, twoA, twoB, a3);
 		
 		
 		
@@ -126,14 +126,14 @@ public class Main {
 		System.out.println("1b = " + calculatePoints(b1, n));
 		System.out.println("1c = " + calculatePoints(c1, n));
 		System.out.println("1d = " + d1);
-		System.out.println("2a = " + a2);
-		System.out.println("2b = " + b2);
+		System.out.println("2a = " + twoA);
+		System.out.println("2b = " + twoB);
 		System.out.println("3a = " + a3);
 		System.out.println("Final Grade: " + finalgrade);
 		
 		System.out.println("\n--------------------------------------------\n");
 		
-		updateOutputString(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3, finalgrade);
+		updateOutputString(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, twoA, twoB, a3, finalgrade);
 	}
 
 	private static void updateOutputString(float a1, float b1, float c1, float d1, 

@@ -20,7 +20,7 @@ public class Main {
 
 	static boolean printErrorDetails = false;
 	static StringBuffer outputString = null;
-	
+
 	public static void main(String[] args) {
 
 		if(args.length != 1 && args.length != 2)
@@ -59,7 +59,7 @@ public class Main {
 			//making sure its sorted
 			File[] files = corpusPath.listFiles();
 			Arrays.sort(files);
-			
+
 			for(File file : files) {
 				if(file.isFile()) {		
 					Essay essay = new Essay(Reader.readTestingFile(file.getAbsolutePath()),file.getName());
@@ -80,7 +80,7 @@ public class Main {
 		float n = essay.getSentences().size();
 		float d1 = 0, a1 = 0, b1 = 0, c1 = 0, twoA = 0, twoB = 0, a3 = n, finalgrade = 0;
 
-		
+
 		//Part 1 - 1a, 1b, 1c, 3
 		for( Sentence s : essay.getSentences() ) {
 
@@ -97,30 +97,30 @@ public class Main {
 		}
 		if(n >= 5)
 			a3 = 5;
-		
+
 		//Part 2 - 1d, 2a, 2b 
 		d1 = getOneD(essay);
 		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
 		twoB = essay.getTwoBScore();
-		
-		
-		
+
+
+
 		//2a crap
 		SemanticTwoA.processSecondPart(essay); // calculate 2a score
 		int sbars = WordOrder.countSbar(essay);
 		int twoAErrors = essay.getTwoAErrors();
 		essay.setTwoAErrors( (int) (twoAErrors + ((sbars) + b1)) );
 		essay.setTwoAScore(calculatePoints(essay.getTwoAErrors(), essay.getOriginalSentence().size()));
-//		System.out.println("2a: " + twoAErrors + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
+		//		System.out.println("2a: " + twoAErrors + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
 		twoA = essay.getTwoAScore();
-		
+
 		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, twoA, twoB, a3);
-		
-		
-		
+
+
+
 		System.out.println(essay.getFilename() + "\n");
-		System.out.println("Number of sentences = " + n);
-		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+		//		System.out.println("Number of sentences = " + n);
+		//		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
 		System.out.println("\nScores are:");
 		System.out.println("1a = " + calculatePoints(a1, n));
 		System.out.println("1b = " + calculatePoints(b1, n));
@@ -130,15 +130,15 @@ public class Main {
 		System.out.println("2b = " + twoB);
 		System.out.println("3a = " + a3);
 		System.out.println("Final Grade: " + finalgrade);
-		
+
 		System.out.println("\n--------------------------------------------\n");
-		
+
 		updateOutputString(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, twoA, twoB, a3, finalgrade);
 	}
 
 	private static void updateOutputString(float a1, float b1, float c1, float d1, 
 			float a2, float b2, float a3, float finalGrade) {
-		
+
 		if(outputString == null) {
 			//header
 			outputString = new StringBuffer("1a,1b,1c,1d,2a,2b,3a,final\n");
@@ -147,37 +147,37 @@ public class Main {
 		outputString.append((int)a1 + "," + (int)b1 + "," + (int)c1 + "," + (int)d1 + "," +
 				(int)a2 + "," + (int)b2 + "," + (int)a3 + "," + finalGrade + "\n");
 	}
-	
+
 	private static void writeOutput() {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File("output.txt")));
 			bw.write(outputString.toString());
 			bw.close();
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static int getOneD(Essay essay)
 	{
 		float d1 = 0;
 		int sbar = WordOrder.countSbar(essay);
 		int temp1 = 0,temp2 = 0,temp3 = 0;
-		
+
 		int originalSentenceNumber = essay.getOriginalSentence().size();
 		for(Sentence s : essay.getOriginalSentence()){
 			WordOrder.getWordOrderErrors(s);
 			Criteria.isVerbNounAgreeing(s);
 			Criteria.isVerbAgreeing(s);
-			
+
 			temp1+=s.getErrors().get("1b").getErrorCount();
 			temp2+=s.getErrors().get("1a").getErrorCount();
 			temp3+=s.getErrors().get("1c").getErrorCount();
 		}
-		
+
 		float ratio = (sbar+temp1 + temp2 + temp3)/(float)originalSentenceNumber;
-		
+
 		if(ratio < .5){
 			d1 = 5;
 		}
@@ -187,25 +187,36 @@ public class Main {
 		if(ratio > 1.3){
 			d1 = 1;
 		}
-		
+
 		return (int)d1;
 
 	}
-	
+
 	//Assign a point (1-5) for each criteria according to number of errors.
-	static int calculatePoints(float errorNumber, float essaySize) {
-		return Math.round(5 * ( (essaySize - errorNumber) / essaySize) );
+	public static int calculatePoints(float errorNumber, float essaySize) {
+		if(essaySize > errorNumber)
+			return Math.round(5 * ( (essaySize - errorNumber) / essaySize) );
+		else{
+			// assuming this will never happen
+			if(errorNumber == essaySize)
+			{
+				return 2;
+			}
+			else
+				return 1;
+		}
+			
 	}
 
 	private static float calculateFinalGrade(float a1, float b1, float c1, float d1, float a2, float b2, float a3) {
 		float score = (a1 + b1 + c1 + 2*d1 + a2 + 3*b2 + a3) / 10;
 		float decimal = score - (int) score;
-		
+
 		if(decimal >= 0.25f && decimal < 0.75f)
 			score = ((int) score) + 0.5f;
 		else
 			score = Math.round(score);
-		
+
 		return score;
 	}
 }

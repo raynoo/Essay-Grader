@@ -82,7 +82,7 @@ public class SemanticTwoA
 					}
 					//if they/them/their check for plural noun
 					else if(isThirdPlural(word.word())) {
-						TaggedWord numberMatch = null;
+//						TaggedWord numberMatch = null;
 //						//check number
 //						if(numberMatch == null && checkNumber(word.word(), t.word())) {
 //							numberMatch = t;
@@ -97,10 +97,10 @@ public class SemanticTwoA
 			errorCount += ed.getErrorCount();
 			sentence.getErrors().put("2a", ed);
 		}
-//		int sbars = WordOrder.countSbar(essay);
-//		System.out.println(sbars + ", " + errorCount);
-//		errorCount += sbars;
-//		essay.setTwoAScore(Main.calculatePoints(errorCount, sentences.size()));
+		//adding number of sbars to errors
+		errorCount += WordOrder.countSbar(essay);
+		essay.setTwoAErrors(errorCount);
+		
 	}
 	
 	private static boolean checkGender(String pronounWord, String nounWord) {

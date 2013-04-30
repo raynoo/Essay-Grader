@@ -99,20 +99,20 @@ public class Main {
 			a3 = 5;
 		
 		//Part 2 - 1d, 2a, 2b 
-		SemanticTwoA.processSecondPart(essay); // calculate 2a score
-		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
-		a2 = essay.getTwoBScore();
 		d1 = getOneD(essay);
+		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
+		b2 = essay.getTwoBScore();
 		
 		
 		
 		//2a crap
+		SemanticTwoA.processSecondPart(essay); // calculate 2a score
 		int sbars = WordOrder.countSbar(essay);
 		int twoa = essay.getTwoAErrors();
-		essay.setTwoAErrors( (int) (twoa + ((sbars/2) + b1)/2) );
+		essay.setTwoAErrors( (int) (twoa + ((sbars) + b1)) );
 		essay.setTwoAScore(calculatePoints(essay.getTwoAErrors(), essay.getOriginalSentence().size()));
-//		System.out.println("2a: " + twoa + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
-		b2 = essay.getTwoAScore();
+		System.out.println("2a: " + twoa + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
+		a2 = essay.getTwoAScore();
 		
 		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3);
 		
@@ -121,7 +121,6 @@ public class Main {
 		System.out.println(essay.getFilename() + "\n");
 		System.out.println("Number of sentences = " + n);
 		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
-//		System.out.println("number of 1d error = " + d1 + ", number of 2a error = " + a2 + ", number of 2b error = " + b2 + ", number of 3a error = " + a3);
 		System.out.println("\nScores are:");
 		System.out.println("1a = " + calculatePoints(a1, n));
 		System.out.println("1b = " + calculatePoints(b1, n));
@@ -181,15 +180,12 @@ public class Main {
 		
 		if(ratio < .5){
 			d1 = 5;
-//			System.out.println(essay.getFilename());
 		}
 		else if(ratio<=1.3){
 			d1 = 4;
-//			System.out.println(essay.getFilename());
 		}
 		if(ratio > 1.3){
 			d1 = 1;
-//			System.out.println(essay.getFilename());
 		}
 		
 		return (int)d1;

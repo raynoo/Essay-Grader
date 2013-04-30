@@ -32,7 +32,7 @@ public class Tags {
 		String[] fePrp = {"she","her","hers"};
 		String[] maPrp = {"he","his","him"};
 		String[] plPrp = {"we","they","them","their","those","us"};
-		String[] persPrp = {"I","me","my"};
+		String[] persPrp = {"i","me","my"};
 		
 		femalePRPWords.addAll(Arrays.asList(fePrp));
 		malePRPWords.addAll(Arrays.asList(maPrp));

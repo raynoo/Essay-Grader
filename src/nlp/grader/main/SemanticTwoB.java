@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashSet;
 
+import sun.font.SunFontManager.FamilyDescription;
+
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
 
@@ -21,6 +23,7 @@ public class SemanticTwoB {
 
 
 	private static HashSet<String> relaventWords = new HashSet<String>();
+	private static HashSet<String> exceptionWords = new HashSet<String>();
 
 	static{
 
@@ -32,6 +35,11 @@ public class SemanticTwoB {
 				if( word.length()  > 0 && !word.contains("#"))
 					relaventWords.add(word);
 			}
+			
+			exceptionWords.add("friend");
+			exceptionWords.add("neighbour");
+			exceptionWords.add("neighbor");
+			
 			br.close();
 		}
 		catch(Exception e){
@@ -44,6 +52,7 @@ public class SemanticTwoB {
 	{
 		int foundFamily = 0;  // sub 3 if 0, 2 if 1 
 		int foundFirstPrp = 0; // sub 1
+		int foundExceptionWords = 0;
 		int totalScore = 5;
 
 		for(Sentence sentence : essay.getSentences())
@@ -61,8 +70,15 @@ public class SemanticTwoB {
 				{
 					foundFirstPrp++;
 				}
+				else if( exceptionWords.contains(word) )
+				{
+					foundExceptionWords++;
+				}
 			}
 		}
+		
+		if( foundFamily != 0 )
+			foundFamily+=foundExceptionWords;
 		
 		if(foundFamily == 2)
 			totalScore-=1;

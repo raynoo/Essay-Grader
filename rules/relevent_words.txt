@@ -14,7 +14,6 @@ grandfather
 grandmother
 boyfriend
 girlfriend
-friend
 brother
 sister
 uncle

@@ -82,7 +82,7 @@ public class Main {
 
 		
 		//Part 1 - 1a, 1b, 1c, 3
-		for( Sentence s : essay.getOriginalSentence() ) {
+		for( Sentence s : essay.getSentences() ) {
 
 			WordOrder.getWordOrderErrors(s);
 			Criteria.isVerbNounAgreeing(s);
@@ -101,9 +101,18 @@ public class Main {
 		//Part 2 - 1d, 2a, 2b 
 		SemanticTwoA.processSecondPart(essay); // calculate 2a score
 		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
-		a2 = calculatePoints(essay.getTwoBScore(), essay.getOriginalSentence().size());
-		b2 = essay.getTwoBScore();
+		a2 = essay.getTwoBScore();
 		d1 = getOneD(essay);
+		
+		
+		
+		//2a crap
+		int sbars = WordOrder.countSbar(essay);
+		int twoa = essay.getTwoAErrors();
+		essay.setTwoAErrors( (int) (twoa + ((sbars/2) + b1)/2) );
+		essay.setTwoAScore(calculatePoints(essay.getTwoAErrors(), essay.getOriginalSentence().size()));
+//		System.out.println("2a: " + twoa + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
+		b2 = essay.getTwoAScore();
 		
 		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, a2, b2, a3);
 		
@@ -112,7 +121,7 @@ public class Main {
 		System.out.println(essay.getFilename() + "\n");
 		System.out.println("Number of sentences = " + n);
 		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
-		System.out.println("number of 1d error = " + d1 + ", number of 2a error = " + a2 + ", number of 2b error = " + b2 + ", number of 3a error = " + a3);
+//		System.out.println("number of 1d error = " + d1 + ", number of 2a error = " + a2 + ", number of 2b error = " + b2 + ", number of 3a error = " + a3);
 		System.out.println("\nScores are:");
 		System.out.println("1a = " + calculatePoints(a1, n));
 		System.out.println("1b = " + calculatePoints(b1, n));

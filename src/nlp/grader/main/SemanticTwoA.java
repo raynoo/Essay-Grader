@@ -92,11 +92,15 @@ public class SemanticTwoA
 					}
 
 				}
+				
 			}
 			errorCount += ed.getErrorCount();
 			sentence.getErrors().put("2a", ed);
 		}
-		essay.setTwoAScore(Main.calculatePoints(errorCount, sentences.size()));
+//		int sbars = WordOrder.countSbar(essay);
+//		System.out.println(sbars + ", " + errorCount);
+//		errorCount += sbars;
+//		essay.setTwoAScore(Main.calculatePoints(errorCount, sentences.size()));
 	}
 	
 	private static boolean checkGender(String pronounWord, String nounWord) {

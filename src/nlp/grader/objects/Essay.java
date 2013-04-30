@@ -13,7 +13,7 @@ public class Essay {
 	private List<Sentence> originalSentence;
 	private List<Sentence> essay;
 	private Points essayPoints;
-	int twoBScore, twoAScore;
+	int twoBScore, twoAScore, twoAErrors;
 	String filename;
 
 	public String getFilename(){
@@ -129,4 +129,11 @@ public class Essay {
 		this.twoAScore = twoAScore;
 	}
 
+	public int getTwoAErrors() {
+		return this.twoAErrors;
+	}
+	
+	public void setTwoAErrors(int twoAErrors) {
+		this.twoAErrors = twoAErrors;
+	}
 }

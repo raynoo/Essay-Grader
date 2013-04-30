@@ -72,17 +72,13 @@ public class SemanticTwoB {
 			totalScore-=5;
 		
 		if(foundFirstPrp >=2 && foundFamily == 0)
-		{
-			
+		{			
 			totalScore+=3;
 		}
 		else if(foundFirstPrp ==1 && foundFamily == 0)
-		{
-			
+		{			
 			totalScore+=1;
-		}
-		
-		
+		}		
 		essay.setTwoBScore(totalScore);
 	}
 

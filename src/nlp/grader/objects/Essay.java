@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import nlp.grader.main.Main;
+
 import edu.stanford.nlp.trees.Tree;
 
 public class Essay {
@@ -122,7 +124,13 @@ public class Essay {
 	}
 
 	public int getTwoAScore() {
-		return twoBScore;
+		int twoaScore = Main.calculatePoints(this.twoAErrors, this.originalSentence.size());
+		
+		if(twoaScore <=0)
+			twoaScore = 1;
+		
+		this.twoAScore = twoaScore;
+		return twoAScore;
 	}
 
 	public void setTwoAScore(int twoAScore) {

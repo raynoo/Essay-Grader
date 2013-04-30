@@ -98,20 +98,14 @@ public class Main {
 		if(n >= 5)
 			a3 = 5;
 
-		//Part 2 - 1d, 2a, 2b 
+		//Part 2 - 1d, 2b 
 		d1 = getOneD(essay);
 		SemanticTwoB.processSecondPart(essay); // calculate 2b score		
 		twoB = essay.getTwoBScore();
 
-
-
-		//2a crap
+		//2a
 		SemanticTwoA.processSecondPart(essay); // calculate 2a score
-		int sbars = WordOrder.countSbar(essay);
-		int twoAErrors = essay.getTwoAErrors();
-		essay.setTwoAErrors( (int) (twoAErrors + ((sbars) + b1)) );
-		essay.setTwoAScore(calculatePoints(essay.getTwoAErrors(), essay.getOriginalSentence().size()));
-		//		System.out.println("2a: " + twoAErrors + ", sbars: " + sbars + ", 1b: " + b1 + ", " + essay.getOriginalSentence().size());
+		essay.setTwoAErrors( (int) (essay.getTwoAErrors() + b1) );
 		twoA = essay.getTwoAScore();
 
 		finalgrade = calculateFinalGrade(calculatePoints(a1, n), calculatePoints(b1, n), calculatePoints(c1, n), d1, twoA, twoB, a3);
@@ -119,8 +113,8 @@ public class Main {
 
 
 		System.out.println(essay.getFilename() + "\n");
-		//		System.out.println("Number of sentences = " + n);
-		//		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
+//		System.out.println("Number of sentences = " + n);
+//		System.out.println("number of 1a error = " + a1 + ", number of 1b error = " + b1 + ", number of 1c error = " + c1);
 		System.out.println("\nScores are:");
 		System.out.println("1a = " + calculatePoints(a1, n));
 		System.out.println("1b = " + calculatePoints(b1, n));

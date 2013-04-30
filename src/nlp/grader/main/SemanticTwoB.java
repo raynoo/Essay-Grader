@@ -4,12 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashSet;
 
-import sun.font.SunFontManager.FamilyDescription;
-
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.process.Morphology;
 
-import nlp.grader.objects.ErrorDetails;
 import nlp.grader.objects.Essay;
 import nlp.grader.objects.Sentence;
 import nlp.grader.objects.Tags;

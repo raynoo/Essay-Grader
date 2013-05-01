@@ -1,0 +1,28 @@
+# related people
+family
+children
+child
+son
+sons
+daughter
+daughters
+father
+mother
+grand father
+grand mother
+grandfather
+grandmother
+boyfriend
+girlfriend
+brother
+sister
+uncle
+aunty
+aunt
+nephew
+niece
+cousin
+wife
+husband
+grandson
+granddaughter

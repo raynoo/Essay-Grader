@@ -1,0 +1,10 @@
+# subject verb object is not alwuays true. there may be cases where we dont  have a object
+# idea is check the position of the object if there is PObject or DObject
+#
+# Rule 1. cases where object comes before proposition, for all the cases the object should be after the preposition
+# question wh sentences
+# with passive verb
+# relative clause , this is the book i told you about // not be handled
+#
+# if there is a preposition in the end of a sentence check if it is WH sentence
+

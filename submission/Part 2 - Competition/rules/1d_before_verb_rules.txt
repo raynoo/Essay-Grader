@@ -1,0 +1,36 @@
+#bigram rules
+#tags preceding verbs
+PRP VBZ
+PRP VBP
+PRP VBD
+WDT MD
+TO VB
+NNP VBD
+WDT VBD
+WP VBD
+NN VBD
+RB VBN
+IN VBN
+RBS VBN
+NNS VBP
+WDT VBP
+WP VBP
+RB VBP
+NNPS VBP
+RB VBZ
+WP VBZ
+DT VBZ
+NN VBZ
+EX VBZ
+
+#adding more that were missed from test corpus
+CC VBN
+CC VBD
+NNP VBZ
+RB VB
+#PRP VBN
+
+
+#VBZ VBN
+#VBZ VBG
+#VBZ VBG

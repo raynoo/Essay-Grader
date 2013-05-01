@@ -1,0 +1,18 @@
+#verb tags that can occur next to each other
+
+#VBP can be am. then vbn is wrong shud be vbg.
+VBP VBN
+VBP VBG
+VBZ VBG
+VBZ VBD
+VBZ VBN
+
+#from bigrams
+VB VBN
+VBD VBN
+VBG VBN
+#VBG VBD => Standing in water WAS a bad idea. here were is not possible. so check if subj=VBG then verb has to be VBD singular (is was)
+#VBG VBZ => Standing in water HAS its problems.
+VBN VBD
+VBP VBG
+VBZ VBN

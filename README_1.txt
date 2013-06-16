@@ -1,4 +1,3 @@
-
 Project 1 for CS421 - University of Illinois at Chicago
 
 Renu Srinivasan - rsrini7(at)uic.edu
